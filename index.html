@@ -454,55 +454,192 @@
   .wish-card p{ font-size:16px; line-height:1.65; color:#3a2b52; }
   .wish-card .sign{ display:block; margin-top:16px; font-family:var(--font-display); font-size:15px; color:var(--tangerine-dark); }
 
-  /* ============================= HIGHLIGHTS (flip cards) ============================= */
-  .flip-grid{
+  /* ============================= HIGHLIGHTS (scratch cards) ============================= */
+  .scratch-grid{
     margin-top:48px;
     display:grid;
-    grid-template-columns:repeat(4, 1fr);
+    grid-template-columns:repeat(3, 1fr);
     gap:20px;
   }
-  .flip-card{
-    perspective:1000px;
-    height:190px;
-  }
-  .flip-card button{
-    all:unset;
-    display:block;
-    width:100%; height:100%;
+  .scratch-card{
     position:relative;
-    transform-style:preserve-3d;
-    transition:transform .6s cubic-bezier(.2,.8,.2,1);
+    height:190px;
     border-radius:var(--radius-md);
-  }
-  .flip-card.flipped button{ transform:rotateY(180deg); }
-  .flip-face{
-    position:absolute; inset:0;
-    border-radius:var(--radius-md);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    text-align:center; padding:18px;
-    backface-visibility:hidden;
-    -webkit-backface-visibility:hidden;
-  }
-  .flip-front{
+    overflow:hidden;
     background:rgba(255,255,255,.06);
     border:1px solid rgba(255,255,255,.16);
   }
-  .flip-front .emoji{ font-size:34px; margin-bottom:10px; }
-  .flip-front .flabel{ font-family:var(--font-display); font-weight:700; font-size:17px; color:var(--turquoise); }
-  .flip-front .tap{ margin-top:10px; font-size:12px; color:#bccca8; }
-  .flip-back{
+  .scratch-reveal{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:20px;
     background:linear-gradient(160deg, var(--violet), #6a4fc7);
-    transform:rotateY(180deg);
-    font-size:14.5px;
-    line-height:1.55;
     color:var(--cream);
-    font-weight:600;
   }
-  .flip-card:nth-child(2n) .flip-back{
+  .scratch-card:nth-child(2n) .scratch-reveal{
     background:linear-gradient(160deg, var(--sage), var(--sage-dark));
   }
-  .flip-card:nth-child(2n) .flip-front .flabel{ color:var(--sage); }
-  .flip-card button:hover .flip-front{ border-color:var(--sage); }
+  .scratch-reveal .emoji{ font-size:30px; margin-bottom:8px; }
+  .scratch-reveal .slabel{ font-family:var(--font-display); font-weight:700; font-size:15px; margin-bottom:6px; }
+  .scratch-reveal .stext{ font-size:13.5px; line-height:1.5; font-weight:600; }
+  .scratch-canvas{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    cursor:grab;
+    touch-action:none;
+  }
+  .scratch-canvas:active{ cursor:grabbing; }
+  .scratch-card.revealed .scratch-canvas{
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .5s ease;
+  }
+  .scratch-card:focus-visible{ outline:3px solid var(--gold); outline-offset:3px; }
+
+  /* ============================= SLOT MACHINE ============================= */
+  .slot-card{
+    margin-top:48px;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(156,175,136,.3);
+    border-radius:var(--radius-lg);
+    padding:36px clamp(20px,4vw,44px) 40px;
+    text-align:center;
+  }
+  .slot-reels{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:16px;
+    margin-bottom:26px;
+  }
+  .slot-reel{
+    width:88px; height:88px;
+    border-radius:var(--radius-md);
+    background:rgba(255,255,255,.07);
+    border:2px solid rgba(255,255,255,.18);
+    display:flex; align-items:center; justify-content:center;
+    font-size:40px;
+    box-shadow:inset 0 4px 14px rgba(0,0,0,.35);
+  }
+  .slot-reel.spinning{ animation:slot-shake .12s linear infinite; }
+  @keyframes slot-shake{
+    0%{ transform:translateY(0); }
+    50%{ transform:translateY(-4px); }
+    100%{ transform:translateY(0); }
+  }
+  .slot-spin-btn{
+    border:none;
+    background:linear-gradient(135deg, var(--sage), var(--sage-dark));
+    color:#fff;
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:15px;
+    padding:12px 30px;
+    border-radius:100px;
+    box-shadow:0 12px 26px rgba(116,140,99,.4);
+    transition:transform .2s ease;
+  }
+  .slot-spin-btn:hover:not(:disabled){ transform:translateY(-2px) scale(1.03); }
+  .slot-spin-btn:disabled{ opacity:.6; cursor:default; }
+  .slot-result{
+    margin-top:22px;
+    min-height:24px;
+    font-size:15.5px;
+    color:#e6ecdd;
+    opacity:0;
+    transform:translateY(6px);
+    transition:opacity .4s ease, transform .4s ease;
+  }
+  .slot-result.show{ opacity:1; transform:translateY(0); }
+  .slot-count{
+    margin-top:12px;
+    font-size:12.5px;
+    color:#bccca8;
+    letter-spacing:.04em;
+  }
+
+  /* ============================= PIN A WISH ============================= */
+  .corkboard{
+    margin-top:48px;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(255,255,255,.03) 0, transparent 40%),
+      rgba(255,255,255,.04);
+    border:1px dashed rgba(156,175,136,.4);
+    border-radius:var(--radius-lg);
+    padding:32px clamp(18px,4vw,40px) 36px;
+  }
+  .wish-input-row{
+    display:flex; gap:12px;
+    flex-wrap:wrap;
+  }
+  .wish-input-row input{
+    flex:1; min-width:200px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(156,175,136,.4);
+    border-radius:100px;
+    padding:13px 20px;
+    color:var(--cream);
+    font-family:var(--font-body);
+    font-size:15px;
+  }
+  .wish-input-row input::placeholder{ color:#a9b89a; }
+  .wish-input-row input:focus{ border-color:var(--sage); }
+  .pin-btn{
+    border:none;
+    background:linear-gradient(135deg, var(--sage), var(--sage-dark));
+    color:#fff;
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:15px;
+    padding:12px 24px;
+    border-radius:100px;
+    box-shadow:0 12px 26px rgba(116,140,99,.4);
+    transition:transform .2s ease;
+    flex:none;
+  }
+  .pin-btn:hover{ transform:translateY(-2px) scale(1.03); }
+  .wish-note-count{
+    margin-top:10px; font-size:12.5px; color:#a9b89a;
+  }
+  .wish-notes{
+    margin-top:26px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+  }
+  .wish-note{
+    width:150px;
+    min-height:120px;
+    padding:16px 14px;
+    border-radius:3px;
+    font-size:13.5px;
+    line-height:1.5;
+    color:var(--ink);
+    box-shadow:0 12px 22px var(--shadow);
+    cursor:pointer;
+    position:relative;
+    animation:note-pin .4s cubic-bezier(.3,1.5,.4,1);
+    transition:transform .2s ease;
+    word-break:break-word;
+  }
+  .wish-note:hover{ transform:scale(1.05) rotate(0deg) !important; }
+  .wish-note::before{
+    content:'📌';
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    font-size:18px;
+  }
+  @keyframes note-pin{
+    0%{ transform:scale(.4) rotate(0deg); opacity:0; }
+    70%{ transform:scale(1.08); opacity:1; }
+    100%{ transform:scale(1); opacity:1; }
+  }
+  .note-c1{ background:#fff6ea; }
+  .note-c2{ background:#e4edd6; }
+  .note-c3{ background:#ffe9d1; }
+  .note-c4{ background:#ffe0ea; }
+  .wish-note-empty{
+    font-size:14px; color:#a9b89a; font-style:italic;
+  }
 
   /* ============================= AGE GUESS SLIDER ============================= */
   .guess-card{
@@ -1020,7 +1157,9 @@
   /* ============================= RESPONSIVE ============================= */
   @media (max-width:880px){
     .wish-grid{ grid-template-columns:1fr; }
-    .flip-grid{ grid-template-columns:repeat(2, 1fr); }
+    .scratch-grid{ grid-template-columns:repeat(2, 1fr); }
+    .slot-reels{ gap:10px; }
+    .slot-reel{ width:70px; height:70px; font-size:32px; }
     .garland{ grid-template-columns:repeat(2, 1fr); }
     .gift-row{ grid-template-columns:repeat(2,1fr); gap:36px; }
     .wheel-stage{ flex-direction:column; text-align:center; gap:28px; }
@@ -1030,7 +1169,7 @@
     .reaction-dock{ flex-direction:row; left:50%; transform:translateX(-50%); bottom:14px; }
   }
   @media (max-width:480px){
-    .flip-card{ height:170px; }
+    .scratch-card{ height:170px; }
     .wheel-wrap{ width:230px; height:230px; }
   }
 
@@ -1128,55 +1267,83 @@
     </div>
   </section>
 
-  <!-- ============================= HIGHLIGHT REEL ============================= -->
-  <section class="tight" id="highlights">
+  <!-- ============================= SCRATCH CARDS ============================= -->
+  <section class="tight" id="scratch-cards">
     <div class="reveal">
       <span class="eyebrow">✨ a few details</span>
-      <h2 class="section-title">Reasons this is basically a national holiday</h2>
-      <p class="section-sub">Tap a card to flip it. Slow clap for whoever thought of that interaction first.</p>
+      <h2 class="section-title">Scratch below the surface</h2>
+      <p class="section-sub">Grab your cursor (or your finger) and scratch off the foil — go on, be nosy.</p>
     </div>
 
-    <div class="flip-grid reveal">
-      <div class="flip-card" data-flip>
-        <button type="button" aria-label="Flip card: The Laugh">
-          <div class="flip-face flip-front">
-            <div class="emoji">😂</div>
-            <div class="flabel">The Laugh</div>
-            <div class="tap">tap to flip</div>
-          </div>
-          <div class="flip-face flip-back">Loud, unfiltered, and somehow contagious across an entire room. You've never once laughed politely, and that's exactly right.</div>
-        </button>
+    <div class="scratch-grid reveal">
+      <div class="scratch-card" data-scratch tabindex="0" role="button" aria-label="Scratch card: The Entrance. Press Enter to reveal.">
+        <div class="scratch-reveal">
+          <div class="emoji">🚪</div>
+          <div class="slabel">The Entrance</div>
+          <div class="stext">You walk into a room and somehow the whole energy shifts up a notch before you've even said anything.</div>
+        </div>
+        <canvas class="scratch-canvas" data-emoji="🚪" data-label="The Entrance"></canvas>
       </div>
-      <div class="flip-card" data-flip>
-        <button type="button" aria-label="Flip card: The Kindness">
-          <div class="flip-face flip-front">
-            <div class="emoji">🤗</div>
-            <div class="flabel">The Kindness</div>
-            <div class="tap">tap to flip</div>
-          </div>
-          <div class="flip-face flip-back">You remember the small stuff — how people take their coffee, what they were nervous about last week. That's a whole skill, and you make it look easy.</div>
-        </button>
+      <div class="scratch-card" data-scratch tabindex="0" role="button" aria-label="Scratch card: The Advice. Press Enter to reveal.">
+        <div class="scratch-reveal">
+          <div class="emoji">💡</div>
+          <div class="slabel">The Advice</div>
+          <div class="stext">You give the kind of advice people actually save screenshots of. Annoyingly good at it, honestly.</div>
+        </div>
+        <canvas class="scratch-canvas" data-emoji="💡" data-label="The Advice"></canvas>
       </div>
-      <div class="flip-card" data-flip>
-        <button type="button" aria-label="Flip card: The Ambition">
-          <div class="flip-face flip-front">
-            <div class="emoji">🚀</div>
-            <div class="flabel">The Ambition</div>
-            <div class="tap">tap to flip</div>
-          </div>
-          <div class="flip-face flip-back">You say "we'll figure it out" and then actually do. Watching you chase something you want is one of the best free shows around.</div>
-        </button>
+      <div class="scratch-card" data-scratch tabindex="0" role="button" aria-label="Scratch card: The Snacks. Press Enter to reveal.">
+        <div class="scratch-reveal">
+          <div class="emoji">🍿</div>
+          <div class="slabel">The Snacks</div>
+          <div class="stext">You always have exactly the snack everyone else forgot to bring. A logistical marvel, frankly.</div>
+        </div>
+        <canvas class="scratch-canvas" data-emoji="🍿" data-label="The Snacks"></canvas>
       </div>
-      <div class="flip-card" data-flip>
-        <button type="button" aria-label="Flip card: The Taste">
-          <div class="flip-face flip-front">
-            <div class="emoji">🎨</div>
-            <div class="flabel">The Taste</div>
-            <div class="tap">tap to flip</div>
-          </div>
-          <div class="flip-face flip-back">Playlists, restaurant picks, the couch you refused to compromise on — you're annoyingly, consistently right about this stuff.</div>
-        </button>
+      <div class="scratch-card" data-scratch tabindex="0" role="button" aria-label="Scratch card: The Hype. Press Enter to reveal.">
+        <div class="scratch-reveal">
+          <div class="emoji">📣</div>
+          <div class="slabel">The Hype</div>
+          <div class="stext">You celebrate other people's wins louder than they do. That's a rare, genuinely good quality.</div>
+        </div>
+        <canvas class="scratch-canvas" data-emoji="📣" data-label="The Hype"></canvas>
       </div>
+      <div class="scratch-card" data-scratch tabindex="0" role="button" aria-label="Scratch card: The Instincts. Press Enter to reveal.">
+        <div class="scratch-reveal">
+          <div class="emoji">🧭</div>
+          <div class="slabel">The Instincts</div>
+          <div class="stext">Your gut is right an unfair amount of the time. Everyone should just start listening to you sooner.</div>
+        </div>
+        <canvas class="scratch-canvas" data-emoji="🧭" data-label="The Instincts"></canvas>
+      </div>
+      <div class="scratch-card" data-scratch tabindex="0" role="button" aria-label="Scratch card: The Glow Up. Press Enter to reveal.">
+        <div class="scratch-reveal">
+          <div class="emoji">🌱</div>
+          <div class="slabel">The Glow Up</div>
+          <div class="stext">Looking back at last year's you versus this year's you — genuinely impressive growth. Keep going.</div>
+        </div>
+        <canvas class="scratch-canvas" data-emoji="🌱" data-label="The Glow Up"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= LUCK SLOT MACHINE ============================= -->
+  <section class="tight" id="slot-luck">
+    <div class="reveal">
+      <span class="eyebrow sage">🎰 quick game</span>
+      <h2 class="section-title">Give your luck a spin</h2>
+      <p class="section-sub">Three reels, one combo, zero real stakes. Pull the lever.</p>
+    </div>
+
+    <div class="slot-card reveal">
+      <div class="slot-reels">
+        <div class="slot-reel" id="slotReelA">🍀</div>
+        <div class="slot-reel" id="slotReelB">🌤️</div>
+        <div class="slot-reel" id="slotReelC">🎁</div>
+      </div>
+      <button class="slot-spin-btn" id="slotSpinBtn" type="button">Pull the lever 🎰</button>
+      <p class="slot-result" id="slotResult"></p>
+      <p class="slot-count" id="slotCount"></p>
     </div>
   </section>
 
@@ -1329,22 +1496,22 @@
   <section class="tight" id="fortune">
     <div class="leaf-divider reveal">🌿 one more game</div>
     <div class="reveal" style="margin-top:34px;">
-      <span class="eyebrow sage">🍀 spin it</span>
-      <h2 class="section-title">Give the birthday fortune wheel a spin</h2>
-      <p class="section-sub">Purely scientific. Extremely accurate. Ask again if you don't like the answer.</p>
+      <span class="eyebrow sage">🔮 spin it</span>
+      <h2 class="section-title">Spin for a look at the year ahead</h2>
+      <p class="section-sub">Six areas of your life, one spin each. Purely scientific. Extremely accurate. Ask again if you don't like the answer.</p>
     </div>
 
     <div class="wheel-stage reveal">
       <div class="wheel-wrap">
         <div class="wheel-pointer" aria-hidden="true"></div>
         <div class="wheel" id="wheel">
-          <div class="wheel-hub">🎯</div>
+          <div class="wheel-hub">🔮</div>
         </div>
       </div>
       <div class="wheel-info">
-        <button class="spin-btn" id="spinBtn" type="button">Spin the wheel</button>
+        <button class="spin-btn" id="spinBtn" type="button">Spin for your year ahead</button>
         <div class="fortune-result" id="fortuneResult">
-          <span class="ftitle">Your fortune</span>
+          <span class="ftitle" id="fortuneCategory">Your forecast</span>
           <span id="fortuneText">—</span>
         </div>
       </div>
@@ -1354,7 +1521,7 @@
   <!-- ============================= PIÑATA ============================= -->
   <section class="tight" id="pinata-section">
     <div class="reveal">
-      <span class="eyebrow sage">🪅 last game, promise</span>
+      <span class="eyebrow sage">🪅 almost there</span>
       <h2 class="section-title">Crack the piñata</h2>
       <p class="section-sub">It's rigged in your favor. Keep clicking.</p>
     </div>
@@ -1364,6 +1531,27 @@
       <div class="hit-track"><div class="hit-fill" id="hitFill"></div></div>
       <p class="pinata-hint" id="pinataHint">tap it a few times</p>
       <p class="pinata-message" id="pinataMessage">Jackpot. Turns out it was full of confetti and good wishes the whole time. 🌿</p>
+    </div>
+  </section>
+
+  <!-- ============================= PIN A WISH ============================= -->
+  <section class="tight" id="wish-wall">
+    <div class="reveal">
+      <span class="eyebrow sage">📌 last game, promise</span>
+      <h2 class="section-title">Pin a wish on the board</h2>
+      <p class="section-sub">Write something quick — it'll stick around while you're on this page.</p>
+    </div>
+
+    <div class="corkboard reveal">
+      <div class="wish-input-row">
+        <input type="text" id="wishInput" maxlength="140" placeholder="Write a quick birthday wish...">
+        <button class="pin-btn" id="pinWishBtn" type="button">Pin it 📌</button>
+      </div>
+      <p class="wish-note-count" id="wishNoteCount">0 wishes pinned so far</p>
+      <div class="wish-notes" id="wishNotes">
+        <div class="wish-note note-c2" style="transform:rotate(-4deg);">Hope this year is the loudest, cake-iest one yet. 🎂</div>
+        <div class="wish-note note-c3" style="transform:rotate(3deg);">More good weather, fewer group chat notifications you have to actually respond to.</div>
+      </div>
     </div>
   </section>
 
@@ -1674,11 +1862,101 @@
   }
 
   /* ---------------------------------------------------------------
-     Flip cards
+     Scratch cards — canvas foil that erases under the pointer/touch;
+     once enough of it is cleared, the rest fades away on its own.
+     Keyboard users can press Enter/Space to reveal instantly.
   --------------------------------------------------------------- */
-  document.querySelectorAll('[data-flip]').forEach(function(card){
-    card.querySelector('button').addEventListener('click', function(){
-      card.classList.toggle('flipped');
+  document.querySelectorAll('[data-scratch]').forEach(function(card){
+    var canvas = card.querySelector('.scratch-canvas');
+    var ctx2d = canvas.getContext('2d');
+    var scratching = false;
+    var revealed = false;
+    var checkCounter = 0;
+
+    function paintFoil(){
+      var w = card.clientWidth, h = card.clientHeight;
+      canvas.width = w; canvas.height = h;
+      var grad = ctx2d.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, '#cddabd');
+      grad.addColorStop(.5, '#9CAF88');
+      grad.addColorStop(1, '#748c63');
+      ctx2d.fillStyle = grad;
+      ctx2d.fillRect(0, 0, w, h);
+      ctx2d.globalAlpha = .12;
+      ctx2d.fillStyle = '#ffffff';
+      for (var i = 0; i < 40; i++){
+        ctx2d.beginPath();
+        ctx2d.arc(Math.random() * w, Math.random() * h, Math.random() * 2 + .5, 0, Math.PI * 2);
+        ctx2d.fill();
+      }
+      ctx2d.globalAlpha = 1;
+      ctx2d.fillStyle = 'rgba(28,18,48,.75)';
+      ctx2d.font = '600 13px ' + getComputedStyle(document.body).fontFamily;
+      ctx2d.textAlign = 'center';
+      ctx2d.fillText('scratch me', w / 2, h / 2 + 26);
+      ctx2d.font = '28px sans-serif';
+      ctx2d.fillText(canvas.dataset.emoji || '🎁', w / 2, h / 2 - 4);
+    }
+    paintFoil();
+    window.addEventListener('resize', function(){ if (!revealed) paintFoil(); });
+
+    function revealCard(){
+      if (revealed) return;
+      revealed = true;
+      card.classList.add('revealed');
+      var r = card.getBoundingClientRect();
+      burstConfetti(r.left + r.width / 2, r.top + r.height / 2, 24);
+      playChime(620 + Math.random() * 200);
+    }
+
+    function erase(x, y){
+      ctx2d.globalCompositeOperation = 'destination-out';
+      ctx2d.beginPath();
+      ctx2d.arc(x, y, 22, 0, Math.PI * 2);
+      ctx2d.fill();
+      ctx2d.globalCompositeOperation = 'source-over';
+    }
+
+    function checkCleared(){
+      checkCounter++;
+      if (checkCounter % 6 !== 0) return; // throttle the pixel scan
+      var w = canvas.width, h = canvas.height;
+      if (!w || !h) return;
+      var data = ctx2d.getImageData(0, 0, w, h).data;
+      var cleared = 0, total = 0;
+      for (var i = 3; i < data.length; i += 4 * 37){ // sparse sample
+        total++;
+        if (data[i] < 40) cleared++;
+      }
+      if (total && cleared / total > 0.5) revealCard();
+    }
+
+    function pointerPos(e){
+      var r = canvas.getBoundingClientRect();
+      var cx = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+      var cy = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+      return { x: cx, y: cy };
+    }
+
+    canvas.addEventListener('pointerdown', function(e){
+      if (revealed) return;
+      scratching = true;
+      var p = pointerPos(e);
+      erase(p.x, p.y);
+    });
+    canvas.addEventListener('pointermove', function(e){
+      if (!scratching || revealed) return;
+      var p = pointerPos(e);
+      erase(p.x, p.y);
+      checkCleared();
+    });
+    window.addEventListener('pointerup', function(){ scratching = false; });
+
+    card.addEventListener('keydown', function(e){
+      if ((e.key === 'Enter' || e.key === ' ') && !revealed){
+        e.preventDefault();
+        revealCard();
+      }
     });
   });
 
@@ -1874,21 +2152,64 @@
   });
 
   /* ---------------------------------------------------------------
-     Fortune wheel — spins to a random slice and reveals a fortune
-     that matches the color it lands on
+     Fortune wheel — spins to a random life category and reveals a
+     forward-looking forecast for the year ahead in that area
   --------------------------------------------------------------- */
   var FORTUNES = [
-    { color: 'sage',      angle: 30,  text: 'This is the year you finally water the plants on schedule. Growth, but make it literal.' },
-    { color: 'pink',      angle: 90,  text: 'A ridiculous amount of good luck is headed your way, mostly disguised as small coincidences.' },
-    { color: 'gold',      angle: 150, text: 'Someone is going to compliment your taste this week and you should just say thank you, no deflecting.' },
-    { color: 'turquoise', angle: 210, text: 'A plan you almost talked yourself out of turns out to be the best decision of the season.' },
-    { color: 'tangerine', angle: 270, text: 'Cake for breakfast is scientifically endorsed at least once this year. You\'re welcome.' },
-    { color: 'violet',    angle: 330, text: 'You will make someone\'s day without even trying. You do that a lot, actually.' }
+    {
+      color: 'sage', angle: 30, category: '🌱 Growth & Habits',
+      texts: [
+        'The habit you keep almost starting finally sticks this year — not through willpower, through it just getting easier.',
+        'You outgrow something that used to feel like "just how you are." Good riddance to it.',
+        'A small, boring, consistent choice you make this year quietly becomes the thing you\'re proudest of by next birthday.'
+      ]
+    },
+    {
+      color: 'pink', angle: 90, category: '💗 Love & Friendship',
+      texts: [
+        'Someone already in your life becomes a much bigger part of it this year, in the best way.',
+        'A friendship that\'s been quiet for a while finds its way back to easy and close.',
+        'You tell someone how much they mean to you before the year is out, and it changes nothing except everything.'
+      ]
+    },
+    {
+      color: 'gold', angle: 150, category: '💼 Career & Money',
+      texts: [
+        'A risk you\'ve been talking yourself out of turns out to be the right call, roughly six months from now.',
+        'Money stress eases up this year — not dramatically, just enough that you can breathe again.',
+        'You get recognized for something you almost didn\'t think was a big deal. It was.'
+      ]
+    },
+    {
+      color: 'turquoise', angle: 210, category: '🧭 Adventure & Travel',
+      texts: [
+        'You go somewhere this year you\'ve been meaning to go for far too long. Book it before you talk yourself out of it again.',
+        'A spontaneous plan turns into one of the best stories you\'ll tell for years.',
+        'This year hands you a genuinely new experience — say yes before you overthink it.'
+      ]
+    },
+    {
+      color: 'tangerine', angle: 270, category: '🎉 Fun & Celebration',
+      texts: [
+        'There is more cake in your future than is strictly necessary. This is not a bad thing.',
+        'You throw or attend a gathering this year that becomes the one everyone still talks about.',
+        'You laugh, properly, unglamorously hard, at least once a month this year. Try to notice it when it happens.'
+      ]
+    },
+    {
+      color: 'violet', angle: 330, category: '🌙 Rest & Reflection',
+      texts: [
+        'You give yourself permission to slow down at exactly the moment you need it — and it works.',
+        'A quiet, ordinary afternoon this year turns out to be one you remember for a long time.',
+        'You finally let something go that\'s been taking up more space in your head than it deserves.'
+      ]
+    }
   ];
 
   var wheelEl = document.getElementById('wheel');
   var spinBtn = document.getElementById('spinBtn');
   var fortuneResult = document.getElementById('fortuneResult');
+  var fortuneCategory = document.getElementById('fortuneCategory');
   var fortuneText = document.getElementById('fortuneText');
   var currentRotation = 0;
   var spinning = false;
@@ -1900,6 +2221,7 @@
     fortuneResult.classList.remove('show');
 
     var pick = FORTUNES[Math.floor(Math.random() * FORTUNES.length)];
+    var line = pick.texts[Math.floor(Math.random() * pick.texts.length)];
     var fullSpins = 4 + Math.floor(Math.random() * 3);
     var target = fullSpins * 360 + (360 - pick.angle);
     currentRotation += target;
@@ -1908,7 +2230,8 @@
     playChime(440);
 
     setTimeout(function(){
-      fortuneText.textContent = pick.text;
+      fortuneCategory.textContent = pick.category;
+      fortuneText.textContent = line;
       fortuneResult.classList.add('show');
       var r = wheelEl.getBoundingClientRect();
       burstConfetti(r.left + r.width / 2, r.top + r.height / 2, 80);
@@ -2053,6 +2376,137 @@
     toast.classList.add('show');
     setTimeout(function(){ toast.classList.remove('show'); }, 2600);
   }
+
+  /* ---------------------------------------------------------------
+     Luck slot machine — three reels spin independently and stagger
+     to a stop, landing on a combo that maps to a fortune-style line
+  --------------------------------------------------------------- */
+  var SLOT_REEL_A = ['🍀','🌟','🎂','🔥','🌈','🦄'];
+  var SLOT_REEL_B = ['🌤️','🌊','⛰️','🌸','❄️','☀️'];
+  var SLOT_REEL_C = ['🎁','💌','🍕','🎶','📚','🧳'];
+  var SLOT_MESSAGES = [
+    'A perfect-weather day is headed your way.',
+    'Someone\'s cooking up a surprise for you already.',
+    'Good news lands when you least expect it.',
+    'A spontaneous trip is more likely than you think.',
+    'Free food, zero effort — the best kind of luck.',
+    'An old friend is about to resurface, in a good way.',
+    'Your next favorite song is one scroll away.',
+    'This year has a plot twist, and it\'s a good one.'
+  ];
+
+  var slotReelEls = {
+    a: document.getElementById('slotReelA'),
+    b: document.getElementById('slotReelB'),
+    c: document.getElementById('slotReelC')
+  };
+  var slotBtn = document.getElementById('slotSpinBtn');
+  var slotResult = document.getElementById('slotResult');
+  var slotCount = document.getElementById('slotCount');
+  var slotSpins = 0;
+  var slotSpinning = false;
+
+  function spinReel(el, options, duration, finalIndex, onDone){
+    var start = performance.now();
+    var interval = setInterval(function(){
+      el.textContent = options[Math.floor(Math.random() * options.length)];
+    }, 60);
+    setTimeout(function(){
+      clearInterval(interval);
+      el.textContent = options[finalIndex];
+      playChime(500 + finalIndex * 40);
+      if (onDone) onDone();
+    }, duration);
+  }
+
+  function slotSpin(){
+    if (slotSpinning) return;
+    slotSpinning = true;
+    slotBtn.disabled = true;
+    slotBtn.textContent = 'Spinning…';
+    slotResult.classList.remove('show');
+
+    [slotReelEls.a, slotReelEls.b, slotReelEls.c].forEach(function(el){
+      el.classList.add('spinning');
+    });
+
+    var idxA = Math.floor(Math.random() * SLOT_REEL_A.length);
+    var idxB = Math.floor(Math.random() * SLOT_REEL_B.length);
+    var idxC = Math.floor(Math.random() * SLOT_REEL_C.length);
+
+    spinReel(slotReelEls.a, SLOT_REEL_A, 700, idxA, function(){ slotReelEls.a.classList.remove('spinning'); });
+    spinReel(slotReelEls.b, SLOT_REEL_B, 1100, idxB, function(){ slotReelEls.b.classList.remove('spinning'); });
+    spinReel(slotReelEls.c, SLOT_REEL_C, 1500, idxC, function(){
+      slotReelEls.c.classList.remove('spinning');
+      slotSpins++;
+      var msg = SLOT_MESSAGES[(idxA + idxB + idxC) % SLOT_MESSAGES.length];
+      slotResult.textContent = msg;
+      slotResult.classList.add('show');
+      slotCount.textContent = 'Spin #' + slotSpins;
+      var r = slotBtn.getBoundingClientRect();
+      burstConfetti(r.left + r.width / 2, r.top, 50);
+      playChime(760);
+      slotBtn.disabled = false;
+      slotBtn.textContent = 'Spin again 🎰';
+      slotSpinning = false;
+    });
+  }
+
+  slotBtn.addEventListener('click', slotSpin);
+
+  /* ---------------------------------------------------------------
+     Pin a wish — visitors can type a quick note and pin it to the
+     corkboard; notes live for this browser session only
+  --------------------------------------------------------------- */
+  var wishInput = document.getElementById('wishInput');
+  var pinWishBtn = document.getElementById('pinWishBtn');
+  var wishNotes = document.getElementById('wishNotes');
+  var wishNoteCount = document.getElementById('wishNoteCount');
+  var NOTE_COLORS = ['note-c1', 'note-c2', 'note-c3', 'note-c4'];
+  var pinnedCount = 2;
+  var MAX_NOTES = 30;
+
+  function updateWishCount(){
+    wishNoteCount.textContent = pinnedCount + ' wish' + (pinnedCount === 1 ? '' : 'es') + ' pinned so far';
+  }
+  updateWishCount();
+
+  function pinWish(){
+    var text = wishInput.value.trim();
+    if (!text) return;
+    if (wishNotes.children.length >= MAX_NOTES){
+      wishNotes.removeChild(wishNotes.firstElementChild);
+    }
+    var note = document.createElement('div');
+    note.className = 'wish-note ' + NOTE_COLORS[Math.floor(Math.random() * NOTE_COLORS.length)];
+    note.style.transform = 'rotate(' + ((Math.random() - 0.5) * 10).toFixed(1) + 'deg)';
+    note.textContent = text;
+    note.title = 'Click to unpin';
+    note.addEventListener('click', function(){
+      note.style.transition = 'transform .3s ease, opacity .3s ease';
+      note.style.transform = 'scale(.5) rotate(20deg)';
+      note.style.opacity = '0';
+      setTimeout(function(){
+        note.remove();
+        pinnedCount = Math.max(0, pinnedCount - 1);
+        updateWishCount();
+      }, 280);
+    });
+    wishNotes.appendChild(note);
+    pinnedCount++;
+    updateWishCount();
+
+    wishInput.value = '';
+    wishInput.focus();
+    var r = pinWishBtn.getBoundingClientRect();
+    burstConfetti(r.left + r.width / 2, r.top, 26);
+    playChime(700);
+  }
+
+  pinWishBtn.addEventListener('click', pinWish);
+  wishInput.addEventListener('keydown', function(e){
+    if (e.key === 'Enter') pinWish();
+  });
 
   /* ---------------------------------------------------------------
      Scroll reveal
