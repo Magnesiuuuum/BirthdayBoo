@@ -15,7 +15,12 @@
      really want to say.
   4. Edit the messages hidden inside the gift boxes in "SURPRISES".
   5. Edit the four facts in "THE HIGHLIGHT REEL".
-  Everything else (animations, confetti, sounds) will just work.
+  6. Edit the fortunes in the "FORTUNE WHEEL" section if you like.
+  7. Swap the 6 entries in the FRIENDS array (in the script, near
+     "FRIENDS' ALBUM DATA") for real photos and real messages from
+     real friends.
+  Everything else (animations, confetti, sounds, sparkle trail,
+  poppable balloons, reaction dock) will just work.
   ══════════════════════════════════════════════════════════════
 -->
 
@@ -26,9 +31,9 @@
 <style>
   /* ============================= TOKENS ============================= */
   :root{
-    --bg-1:#241736;
-    --bg-2:#34204e;
-    --bg-3:#1a1128;
+    --bg-1:#33422b;
+    --bg-2:#28351f;
+    --bg-3:#171f13;
     --pink:#ff4d8d;
     --pink-dark:#e63e7a;
     --gold:#ffc94d;
@@ -38,6 +43,9 @@
     --tangerine:#ff7a45;
     --tangerine-dark:#e85e2a;
     --violet:#8c6fe6;
+    --sage:#9CAF88;
+    --sage-dark:#748c63;
+    --sage-light:#cddabd;
     --cream:#fff6ea;
     --ink:#1c1230;
     --shadow:rgba(20,10,35,.45);
@@ -54,8 +62,8 @@
   body{
     margin:0;
     background:
-      radial-gradient(1200px 700px at 15% -10%, #3c2657 0%, transparent 60%),
-      radial-gradient(1000px 600px at 90% 10%, #452a63 0%, transparent 55%),
+      radial-gradient(1200px 700px at 15% -10%, #4a5c3d 0%, transparent 60%),
+      radial-gradient(1000px 600px at 90% 10%, #566b46 0%, transparent 55%),
       linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 45%, var(--bg-3) 100%);
     background-attachment:fixed;
     color:var(--cream);
@@ -90,6 +98,12 @@
     pointer-events:none; z-index:0;
   }
 
+  /* Sparkle trail canvas — follows the cursor, sits above confetti but below content chrome */
+  #sparkle-canvas{
+    position:fixed; inset:0; width:100%; height:100%;
+    pointer-events:none; z-index:40;
+  }
+
   .wrap{
     position:relative;
     z-index:1;
@@ -111,6 +125,7 @@
     color:var(--gold);
     margin-bottom:14px;
   }
+  .eyebrow.sage{ color:var(--sage); }
 
   .section-title{
     font-size:clamp(30px, 4.5vw, 46px);
@@ -122,8 +137,21 @@
   .section-sub{
     margin-top:14px;
     max-width:560px;
-    color:#e5d9f5;
+    color:#e3ead9;
     font-size:17px;
+  }
+
+  /* little sage leaf divider used between a couple of sections */
+  .leaf-divider{
+    display:flex; align-items:center; gap:10px;
+    color:var(--sage);
+    font-size:13px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+    margin:0 0 -30px;
+  }
+  .leaf-divider::before, .leaf-divider::after{
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg, transparent, var(--sage-dark), transparent);
+    opacity:.6;
   }
 
   /* ---- fixed controls ---- */
@@ -146,8 +174,48 @@
     display:flex; align-items:center; justify-content:center;
     transition:transform .25s ease, background .25s ease;
   }
-  .icon-btn:hover{ transform:translateY(-3px) scale(1.06); background:rgba(255,77,141,.35); }
+  .icon-btn:hover{ transform:translateY(-3px) scale(1.06); background:rgba(156,175,136,.4); }
   .icon-btn:active{ transform:translateY(0) scale(.96); }
+
+  /* ---- floating reaction dock ---- */
+  .reaction-dock{
+    position:fixed;
+    left:18px;
+    bottom:18px;
+    z-index:50;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    background:rgba(28,18,48,.55);
+    border:1px solid rgba(156,175,136,.35);
+    backdrop-filter:blur(8px);
+    border-radius:100px;
+    padding:8px;
+  }
+  .reaction-dock .dock-label{
+    display:none;
+  }
+  .reaction-btn{
+    width:38px; height:38px;
+    border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,.08);
+    font-size:18px;
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .2s cubic-bezier(.3,1.4,.4,1), background .2s ease;
+  }
+  .reaction-btn:hover{ transform:scale(1.15) rotate(-6deg); background:rgba(156,175,136,.35); }
+  .reaction-btn:active{ transform:scale(.9); }
+
+  .floating-reaction{
+    position:fixed; z-index:60; font-size:24px; pointer-events:none;
+    animation:reaction-rise 2.6s ease-out forwards;
+  }
+  @keyframes reaction-rise{
+    0%{ transform:translate(0,0) scale(.6) rotate(0deg); opacity:0; }
+    12%{ opacity:1; transform:translate(0,-10px) scale(1) rotate(0deg); }
+    100%{ transform:translate(var(--drift,20px), -60vh) scale(1.1) rotate(var(--spin,20deg)); opacity:0; }
+  }
 
   /* ============================= REVEAL ============================= */
   .reveal{
@@ -198,7 +266,7 @@
   .hero p.tagline{
     margin-top:22px;
     font-size:clamp(17px,2.2vw,21px);
-    color:#e9def7;
+    color:#e6ecdd;
     max-width:520px;
     margin-left:auto; margin-right:auto;
     opacity:0;
@@ -213,6 +281,9 @@
     position:relative;
     animation:bob 4.5s ease-in-out infinite;
     box-shadow:inset -8px -8px 16px rgba(0,0,0,.18), inset 6px 8px 14px rgba(255,255,255,.25);
+    border:none;
+    padding:0;
+    transition:transform .35s cubic-bezier(.3,1.5,.4,1), opacity .35s ease;
   }
   .balloon::after{
     content:'';
@@ -232,12 +303,27 @@
   .balloon.gold{ background:var(--gold); }
   .balloon.turq{ background:var(--turquoise); }
   .balloon.tang{ background:var(--tangerine); }
+  .balloon.sage{ background:var(--sage); }
   @keyframes bob{ 0%,100%{ transform:translateY(0) rotate(-3deg);} 50%{ transform:translateY(-22px) rotate(3deg);} }
+  .balloon:hover{ transform:scale(1.08); filter:brightness(1.1); }
+  .balloon.popped{ transform:scale(0) rotate(25deg) !important; opacity:0; }
+
+  .pop-counter{
+    margin-top:10px;
+    font-size:13px;
+    font-weight:800;
+    color:var(--sage-light);
+    letter-spacing:.03em;
+    min-height:18px;
+    opacity:0;
+    transition:opacity .3s ease;
+  }
+  .pop-counter.show{ opacity:1; }
 
   .scroll-cue{
     margin-top:64px;
     display:flex; flex-direction:column; align-items:center; gap:8px;
-    color:#cdbdea; font-size:13px; letter-spacing:.08em; text-transform:uppercase;
+    color:#c3d1b3; font-size:13px; letter-spacing:.08em; text-transform:uppercase;
     background:none; border:none; opacity:0; animation:fade-up .8s ease 1.3s forwards;
   }
   .scroll-cue .chev{ animation:chev-bounce 1.8s ease-in-out infinite; font-size:18px; }
@@ -272,7 +358,7 @@
   }
   .candle .stick{
     width:8px; height:34px; margin-top:2px;
-    background:repeating-linear-gradient(180deg, var(--pink) 0 6px, var(--cream) 6px 12px);
+    background:repeating-linear-gradient(180deg, var(--sage) 0 6px, var(--cream) 6px 12px);
     border-radius:2px;
   }
   @keyframes flicker{
@@ -302,7 +388,7 @@
   .tier-bottom{
     width:220px; height:88px;
     margin-top:-4px;
-    background:linear-gradient(180deg, var(--tangerine) 0%, var(--tangerine-dark) 100%);
+    background:linear-gradient(180deg, var(--sage) 0%, var(--sage-dark) 100%);
     border-radius:10px 10px 4px 4px;
   }
   .frosting{
@@ -322,7 +408,7 @@
   }
 
   .cake-hint{
-    margin-top:26px; font-weight:700; color:#e9def7; font-size:15px;
+    margin-top:26px; font-weight:700; color:#e6ecdd; font-size:15px;
     transition:opacity .4s ease;
   }
   .wish-revealed{
@@ -364,6 +450,7 @@
     display:inline-block; font-weight:800; font-size:12px; letter-spacing:.1em;
     text-transform:uppercase; color:var(--pink-dark); margin-bottom:12px;
   }
+  .wish-card:nth-child(2) .label{ color:var(--sage-dark); }
   .wish-card p{ font-size:16px; line-height:1.65; color:#3a2b52; }
   .wish-card .sign{ display:block; margin-top:16px; font-family:var(--font-display); font-size:15px; color:var(--tangerine-dark); }
 
@@ -402,7 +489,7 @@
   }
   .flip-front .emoji{ font-size:34px; margin-bottom:10px; }
   .flip-front .flabel{ font-family:var(--font-display); font-weight:700; font-size:17px; color:var(--turquoise); }
-  .flip-front .tap{ margin-top:10px; font-size:12px; color:#c9bce3; }
+  .flip-front .tap{ margin-top:10px; font-size:12px; color:#bccca8; }
   .flip-back{
     background:linear-gradient(160deg, var(--violet), #6a4fc7);
     transform:rotateY(180deg);
@@ -411,7 +498,81 @@
     color:var(--cream);
     font-weight:600;
   }
-  .flip-card button:hover .flip-front{ border-color:var(--turquoise); }
+  .flip-card:nth-child(2n) .flip-back{
+    background:linear-gradient(160deg, var(--sage), var(--sage-dark));
+  }
+  .flip-card:nth-child(2n) .flip-front .flabel{ color:var(--sage); }
+  .flip-card button:hover .flip-front{ border-color:var(--sage); }
+
+  /* ============================= AGE GUESS SLIDER ============================= */
+  .guess-card{
+    margin-top:48px;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(156,175,136,.3);
+    border-radius:var(--radius-lg);
+    padding:40px clamp(24px,5vw,52px);
+  }
+  .guess-value{
+    font-family:var(--font-display);
+    font-size:clamp(48px,7vw,72px);
+    color:var(--sage-light);
+    text-align:center;
+    line-height:1;
+  }
+  .guess-value span{ font-size:.35em; color:#bccca8; font-weight:700; display:block; margin-top:6px; }
+  .age-slider{
+    width:100%;
+    margin-top:28px;
+    -webkit-appearance:none;
+    appearance:none;
+    height:10px;
+    border-radius:100px;
+    background:linear-gradient(90deg, var(--sage-dark), var(--sage) var(--fill,50%), rgba(255,255,255,.12) var(--fill,50%));
+    outline:none;
+  }
+  .age-slider::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:28px; height:28px; border-radius:50%;
+    background:var(--cream);
+    border:4px solid var(--sage);
+    box-shadow:0 6px 14px var(--shadow);
+    cursor:pointer;
+    transition:transform .15s ease;
+  }
+  .age-slider::-webkit-slider-thumb:hover{ transform:scale(1.12); }
+  .age-slider::-moz-range-thumb{
+    width:28px; height:28px; border-radius:50%;
+    background:var(--cream);
+    border:4px solid var(--sage);
+    box-shadow:0 6px 14px var(--shadow);
+    cursor:pointer;
+  }
+  .lock-btn{
+    display:block;
+    margin:26px auto 0;
+    border:none;
+    background:linear-gradient(135deg, var(--sage), var(--sage-dark));
+    color:#fff;
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:16px;
+    padding:13px 28px;
+    border-radius:100px;
+    box-shadow:0 14px 28px rgba(116,140,99,.4);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .lock-btn:hover{ transform:translateY(-3px) scale(1.03); }
+  .lock-btn:active{ transform:translateY(0) scale(.98); }
+  .guess-response{
+    margin-top:20px;
+    text-align:center;
+    font-size:15px;
+    color:#e6ecdd;
+    min-height:22px;
+    opacity:0;
+    transition:opacity .4s ease;
+  }
+  .guess-response.show{ opacity:1; }
 
   /* ============================= MEMORIES / GALLERY ============================= */
   .garland{
@@ -441,7 +602,7 @@
   .polaroid .pin{
     position:absolute; top:-9px; left:50%; transform:translateX(-50%);
     width:14px; height:14px; border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #fff, var(--pink) 60%);
+    background:radial-gradient(circle at 35% 30%, #fff, var(--sage) 60%);
     box-shadow:0 3px 4px rgba(0,0,0,.35);
   }
 
@@ -474,17 +635,140 @@
   .lightbox-close{
     position:absolute; top:-16px; right:-16px;
     width:38px; height:38px; border-radius:50%;
-    background:var(--pink); color:#fff; border:3px solid var(--bg-2);
+    background:var(--sage); color:#fff; border:3px solid var(--bg-2);
     font-size:18px; display:flex; align-items:center; justify-content:center;
   }
-  .lightbox-close:hover{ background:var(--pink-dark); }
+  .lightbox-close:hover{ background:var(--sage-dark); }
+
+  /* ============================= FRIENDS' ALBUM ============================= */
+  .album-frame{
+    margin-top:52px;
+    position:relative;
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    border:1px solid rgba(156,175,136,.32);
+    border-radius:var(--radius-lg);
+    padding:44px clamp(20px,4vw,48px) 34px;
+  }
+  .album-rings{
+    position:absolute; top:-16px; left:50%; transform:translateX(-50%);
+    display:flex; gap:34px;
+  }
+  .album-rings span{
+    width:22px; height:22px; border-radius:50%;
+    background:var(--bg-3);
+    border:4px solid var(--sage-light);
+    box-shadow:0 4px 8px var(--shadow);
+  }
+  .album-spread{
+    display:grid;
+    grid-template-columns:280px 1fr;
+    gap:40px;
+    align-items:center;
+    min-height:340px;
+  }
+  .album-photo-wrap{ display:flex; flex-direction:column; align-items:center; }
+  .album-photo-card{
+    background:#fff;
+    padding:10px 10px 30px;
+    border-radius:3px;
+    box-shadow:0 18px 40px var(--shadow);
+    transform:rotate(-2deg);
+    cursor:pointer;
+    transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease, opacity .3s ease;
+    width:100%;
+    max-width:260px;
+  }
+  .album-photo-card:hover{ transform:rotate(0deg) scale(1.03); box-shadow:0 24px 50px var(--shadow); }
+  .album-photo-card img{ width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:2px; }
+  .album-photo-card figcaption{
+    margin-top:8px; text-align:center; font-family:var(--font-display);
+    font-size:13px; color:var(--ink);
+  }
+  .album-photo-count{
+    margin-top:14px; font-size:13px; font-weight:700;
+    letter-spacing:.05em; color:var(--sage-light);
+  }
+  .album-message-card{
+    background:rgba(255,255,255,.05);
+    border:1px dashed rgba(156,175,136,.5);
+    border-radius:var(--radius-md);
+    padding:30px clamp(20px,3vw,34px);
+    position:relative;
+    transition:opacity .3s ease, transform .3s ease;
+  }
+  .album-message-card .quote-mark{
+    font-family:var(--font-display);
+    font-size:46px;
+    color:var(--sage);
+    line-height:.4;
+    display:block;
+    margin-bottom:14px;
+  }
+  .album-message-text{
+    font-size:17px;
+    line-height:1.7;
+    color:var(--cream);
+  }
+  .album-signoff{
+    display:flex; align-items:center; gap:10px;
+    margin-top:20px;
+  }
+  .album-avatar{
+    width:38px; height:38px; border-radius:50%;
+    background:linear-gradient(135deg, var(--sage), var(--tangerine));
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-weight:700; color:#fff; font-size:15px;
+    flex:none;
+  }
+  .album-signoff-text .name{ font-family:var(--font-display); font-size:15.5px; color:var(--sage-light); }
+  .album-signoff-text .rel{ font-size:12.5px; color:#bccca8; }
+
+  .album-spread.anim-out{ opacity:0; transform:translateX(var(--slide,-18px)); }
+  .album-spread.anim-in{ animation:album-in .45s cubic-bezier(.2,.8,.2,1); }
+  @keyframes album-in{
+    from{ opacity:0; transform:translateX(calc(var(--slide,-18px) * -1)); }
+    to{ opacity:1; transform:translateX(0); }
+  }
+
+  .album-nav{
+    margin-top:32px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:22px;
+  }
+  .album-arrow{
+    width:44px; height:44px; border-radius:50%;
+    border:1px solid rgba(156,175,136,.4);
+    background:rgba(255,255,255,.06);
+    color:var(--cream);
+    font-size:18px;
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .2s ease, background .2s ease;
+  }
+  .album-arrow:hover{ background:rgba(156,175,136,.35); transform:scale(1.08); }
+  .album-arrow:active{ transform:scale(.94); }
+  .album-dots{ display:flex; gap:9px; }
+  .album-dot{
+    width:9px; height:9px; border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,.22);
+    transition:background .25s ease, transform .25s ease;
+  }
+  .album-dot.active{ background:var(--sage); transform:scale(1.3); }
+  .album-dot:hover{ background:var(--sage-light); }
+
+  @media (max-width:720px){
+    .album-spread{ grid-template-columns:1fr; min-height:0; }
+    .album-photo-card{ max-width:220px; margin:0 auto; }
+  }
 
   /* ============================= SURPRISES / GIFT BOXES ============================= */
   .gift-row{
     margin-top:56px;
     display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:30px;
+    grid-template-columns:repeat(4, 1fr);
+    gap:26px;
   }
   .gift{
     background:none; border:none; color:inherit;
@@ -492,7 +776,7 @@
     padding:10px;
   }
   .gift-box{
-    width:120px; height:100px;
+    width:110px; height:100px;
     position:relative;
     transition:transform .25s ease;
   }
@@ -523,13 +807,161 @@
   .gift-pink .gift-base, .gift-pink .gift-lid{ background:linear-gradient(180deg, var(--pink), var(--pink-dark)); }
   .gift-turq .gift-base, .gift-turq .gift-lid{ background:linear-gradient(180deg, var(--turquoise), var(--turquoise-dark)); }
   .gift-gold .gift-base, .gift-gold .gift-lid{ background:linear-gradient(180deg, var(--gold), var(--gold-dark)); }
+  .gift-sage .gift-base, .gift-sage .gift-lid{ background:linear-gradient(180deg, var(--sage), var(--sage-dark)); }
 
   .gift-msg{
-    max-width:220px; text-align:center; font-size:14.5px; color:#e9def7;
+    max-width:200px; text-align:center; font-size:14px; color:#e6ecdd;
     min-height:22px;
   }
-  .gift-hint{ font-weight:700; font-size:13px; color:var(--gold); letter-spacing:.03em; }
+  .gift-hint{ font-weight:700; font-size:13px; color:var(--sage); letter-spacing:.03em; }
   .gift.opened .gift-hint{ display:none; }
+
+  /* ============================= FORTUNE WHEEL ============================= */
+  .wheel-stage{
+    margin-top:52px;
+    display:flex;
+    align-items:center;
+    gap:56px;
+  }
+  .wheel-wrap{
+    position:relative;
+    width:280px; height:280px;
+    flex:none;
+  }
+  .wheel-pointer{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    width:0; height:0;
+    border-left:14px solid transparent;
+    border-right:14px solid transparent;
+    border-top:22px solid var(--gold);
+    z-index:5;
+    filter:drop-shadow(0 4px 6px var(--shadow));
+  }
+  .wheel{
+    width:100%; height:100%;
+    border-radius:50%;
+    position:relative;
+    box-shadow:0 20px 50px var(--shadow), inset 0 0 0 6px rgba(255,246,234,.15);
+    transition:transform 3.6s cubic-bezier(.12,.68,.14,1);
+    background:conic-gradient(
+      var(--sage) 0deg 60deg,
+      var(--pink) 60deg 120deg,
+      var(--gold) 120deg 180deg,
+      var(--turquoise) 180deg 240deg,
+      var(--tangerine) 240deg 300deg,
+      var(--violet) 300deg 360deg
+    );
+  }
+  .wheel-hub{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:56px; height:56px; border-radius:50%;
+    background:var(--cream);
+    box-shadow:0 6px 14px var(--shadow);
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px;
+  }
+  .wheel-info{ flex:1; }
+  .spin-btn{
+    margin-top:20px;
+    border:none;
+    background:linear-gradient(135deg, var(--sage), var(--sage-dark));
+    color:#fff;
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:17px;
+    padding:14px 30px;
+    border-radius:100px;
+    box-shadow:0 14px 30px rgba(116,140,99,.4);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .spin-btn:hover:not(:disabled){ transform:translateY(-3px) scale(1.03); box-shadow:0 20px 40px rgba(116,140,99,.5); }
+  .spin-btn:active:not(:disabled){ transform:translateY(0) scale(.98); }
+  .spin-btn:disabled{ opacity:.6; cursor:default; }
+  .fortune-result{
+    margin-top:22px;
+    min-height:70px;
+    background:rgba(156,175,136,.12);
+    border:1px dashed rgba(156,175,136,.5);
+    border-radius:var(--radius-md);
+    padding:18px 20px;
+    font-size:15.5px;
+    color:var(--cream);
+    opacity:0;
+    transform:translateY(8px);
+    transition:opacity .45s ease, transform .45s ease;
+  }
+  .fortune-result.show{ opacity:1; transform:translateY(0); }
+  .fortune-result .ftitle{
+    display:block;
+    font-family:var(--font-display);
+    color:var(--sage-light);
+    font-size:13px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+
+  /* ============================= PIÑATA ============================= */
+  .pinata-stage{
+    margin-top:52px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:18px;
+  }
+  .pinata-btn{
+    background:none; border:none; padding:0;
+    font-size:110px;
+    line-height:1;
+    filter:drop-shadow(0 20px 30px var(--shadow));
+    transition:transform .1s ease;
+  }
+  .pinata-btn:hover{ transform:scale(1.05); }
+  .pinata-btn.shake{ animation:pinata-shake .35s ease; }
+  .pinata-btn.broken{ animation:pinata-pop .5s cubic-bezier(.3,1.6,.4,1) forwards; }
+  @keyframes pinata-shake{
+    0%,100%{ transform:rotate(0deg); }
+    25%{ transform:rotate(-12deg) translateX(-6px); }
+    75%{ transform:rotate(12deg) translateX(6px); }
+  }
+  @keyframes pinata-pop{
+    0%{ transform:scale(1); opacity:1; }
+    60%{ transform:scale(1.3); opacity:1; }
+    100%{ transform:scale(0); opacity:0; }
+  }
+  .hit-track{
+    width:220px; height:10px;
+    border-radius:100px;
+    background:rgba(255,255,255,.12);
+    overflow:hidden;
+  }
+  .hit-fill{
+    height:100%; width:0%;
+    background:linear-gradient(90deg, var(--sage-dark), var(--sage));
+    border-radius:100px;
+    transition:width .25s ease;
+  }
+  .pinata-hint{ font-size:14px; font-weight:700; color:var(--sage-light); letter-spacing:.03em; }
+  .candy{
+    position:fixed; top:-20px; z-index:60;
+    font-size:20px; pointer-events:none;
+    animation:candy-fall linear forwards;
+  }
+  @keyframes candy-fall{
+    0%{ transform:translateY(0) rotate(0deg); opacity:1; }
+    100%{ transform:translateY(105vh) rotate(360deg); opacity:.9; }
+  }
+  .pinata-message{
+    margin-top:6px;
+    max-width:380px;
+    text-align:center;
+    font-size:15.5px;
+    color:#e6ecdd;
+    opacity:0;
+    transform:translateY(8px);
+    transition:opacity .5s ease, transform .5s ease;
+  }
+  .pinata-message.show{ opacity:1; transform:translateY(0); }
 
   /* ============================= FOOTER / FINALE ============================= */
   .finale{
@@ -557,9 +989,10 @@
   .signature{
     margin-top:60px;
     font-family:var(--font-display);
-    color:#c9bce3;
+    color:#bccca8;
     font-size:15px;
   }
+  .signature .leaf{ color:var(--sage); }
 
   .floating-heart{
     position:fixed; bottom:-40px; z-index:60;
@@ -579,6 +1012,8 @@
     box-shadow:0 14px 30px var(--shadow);
     z-index:80; opacity:0; transition:opacity .35s ease, transform .35s ease;
     pointer-events:none;
+    max-width:min(90vw, 420px);
+    text-align:center;
   }
   .toast.show{ opacity:1; transform:translate(-50%, 0); }
 
@@ -587,12 +1022,16 @@
     .wish-grid{ grid-template-columns:1fr; }
     .flip-grid{ grid-template-columns:repeat(2, 1fr); }
     .garland{ grid-template-columns:repeat(2, 1fr); }
-    .gift-row{ grid-template-columns:1fr; gap:44px; }
+    .gift-row{ grid-template-columns:repeat(2,1fr); gap:36px; }
+    .wheel-stage{ flex-direction:column; text-align:center; gap:28px; }
+    .wheel-wrap{ margin:0 auto; }
     section{ padding:80px 0; }
     .floatie{ display:none; }
+    .reaction-dock{ flex-direction:row; left:50%; transform:translateX(-50%); bottom:14px; }
   }
   @media (max-width:480px){
     .flip-card{ height:170px; }
+    .wheel-wrap{ width:230px; height:230px; }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -608,24 +1047,33 @@
 <body>
 
 <canvas id="confetti-canvas" aria-hidden="true"></canvas>
+<canvas id="sparkle-canvas" aria-hidden="true"></canvas>
 
 <div class="controls">
   <button class="icon-btn" id="confettiBtn" aria-label="Trigger confetti burst" title="Confetti!">🎉</button>
   <button class="icon-btn" id="muteBtn" aria-label="Mute sound" title="Toggle sound">🔊</button>
 </div>
 
+<div class="reaction-dock" aria-label="Send a quick reaction">
+  <button class="reaction-btn" data-emoji="🎈" aria-label="Send balloon reaction">🎈</button>
+  <button class="reaction-btn" data-emoji="💚" aria-label="Send heart reaction">💚</button>
+  <button class="reaction-btn" data-emoji="🎂" aria-label="Send cake reaction">🎂</button>
+  <button class="reaction-btn" data-emoji="🌿" aria-label="Send leaf reaction">🌿</button>
+</div>
+
 <!-- ============================= HERO ============================= -->
 <header class="hero">
-  <div class="floatie" data-depth="1.6" style="left:6%; top:18%;"><div class="balloon pink"></div></div>
-  <div class="floatie" data-depth="0.8" style="left:14%; top:60%;"><div class="balloon gold" style="animation-delay:-1.2s;"></div></div>
-  <div class="floatie" data-depth="1.2" style="right:8%; top:14%;"><div class="balloon turq" style="animation-delay:-2.4s;"></div></div>
-  <div class="floatie" data-depth="0.6" style="right:16%; top:58%;"><div class="balloon tang" style="animation-delay:-.6s;"></div></div>
-  <div class="floatie" data-depth="1.4" style="left:44%; top:8%;"><div class="balloon turq" style="width:34px;height:44px; animation-delay:-3s;"></div></div>
+  <div class="floatie" data-depth="1.6" style="left:6%; top:18%;"><button class="balloon pink" data-pop></button></div>
+  <div class="floatie" data-depth="0.8" style="left:14%; top:60%;"><button class="balloon gold" data-pop style="animation-delay:-1.2s;"></button></div>
+  <div class="floatie" data-depth="1.2" style="right:8%; top:14%;"><button class="balloon turq" data-pop style="animation-delay:-2.4s;"></button></div>
+  <div class="floatie" data-depth="0.6" style="right:16%; top:58%;"><button class="balloon tang" data-pop style="animation-delay:-.6s;"></button></div>
+  <div class="floatie" data-depth="1.4" style="left:44%; top:8%;"><button class="balloon sage" data-pop style="width:34px;height:44px; animation-delay:-3s;"></button></div>
 
   <div class="hero-inner">
     <span class="eyebrow">🎈 one very special day</span>
     <h1 id="heroTitle">Happy Birthday, <span class="highlight">Alex</span>!</h1>
     <p class="tagline">Another trip around the sun for someone who makes every year better just by being in it. Hope today is loud, sweet, and completely yours.</p>
+    <p class="pop-counter" id="popCounter">🎈 pop a balloon — go on, they respawn</p>
 
     <div class="cake-stage">
       <div class="cake">
@@ -732,6 +1180,22 @@
     </div>
   </section>
 
+  <!-- ============================= AGE GUESS ============================= -->
+  <section class="tight" id="guess">
+    <div class="reveal">
+      <span class="eyebrow sage">🎂 highly scientific</span>
+      <h2 class="section-title">Drag to the number we're all pretending is your age</h2>
+      <p class="section-sub">This has no bearing on reality. It will still be funny.</p>
+    </div>
+
+    <div class="guess-card reveal">
+      <div class="guess-value" id="guessValue">25<span>years young, allegedly</span></div>
+      <input type="range" min="1" max="99" value="25" class="age-slider" id="ageSlider" aria-label="Drag to pick a pretend age">
+      <button class="lock-btn" id="lockBtn" type="button">Lock it in</button>
+      <p class="guess-response" id="guessResponse"></p>
+    </div>
+  </section>
+
   <!-- ============================= MEMORIES ============================= -->
   <section id="memories">
     <div class="reveal">
@@ -766,6 +1230,47 @@
         <img src="https://picsum.photos/seed/birthday-us/400/400" alt="A relaxed everyday moment" loading="lazy">
         <figcaption class="caption">just us</figcaption>
       </figure>
+    </div>
+  </section>
+
+  <!-- ============================= FRIENDS' ALBUM ============================= -->
+  <section id="friends-album">
+    <div class="reveal">
+      <span class="eyebrow sage">💌 from your people</span>
+      <h2 class="section-title">Your friends left you something too</h2>
+      <p class="section-sub">Six photos, six messages. Click the photo to see it bigger, or use the arrows to flip through.</p>
+    </div>
+
+    <div class="album-frame reveal">
+      <div class="album-rings" aria-hidden="true"><span></span><span></span><span></span></div>
+
+      <div class="album-spread" id="albumSpread">
+        <div class="album-photo-wrap">
+          <figure class="album-photo-card" id="albumPhotoCard" tabindex="0" role="button" aria-label="View photo larger">
+            <img id="albumPhoto" src="" alt="">
+            <figcaption id="albumPhotoCaption"></figcaption>
+          </figure>
+          <p class="album-photo-count" id="albumCount">1 / 6</p>
+        </div>
+
+        <div class="album-message-card">
+          <span class="quote-mark" aria-hidden="true">“</span>
+          <p class="album-message-text" id="albumMessage"></p>
+          <div class="album-signoff">
+            <div class="album-avatar" id="albumAvatar"></div>
+            <div class="album-signoff-text">
+              <div class="name" id="albumName"></div>
+              <div class="rel" id="albumRel"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="album-nav">
+        <button class="album-arrow" id="albumPrev" type="button" aria-label="Previous message">‹</button>
+        <div class="album-dots" id="albumDots"></div>
+        <button class="album-arrow" id="albumNext" type="button" aria-label="Next message">›</button>
+      </div>
     </div>
   </section>
 
@@ -807,6 +1312,58 @@
         <span class="gift-hint">tap to open</span>
         <p class="gift-msg" data-msg="This box is empty because the real gift is knowing you. Cheesy? Yes. True? Also yes."></p>
       </button>
+
+      <button class="gift gift-sage" type="button" aria-label="Open sage green gift box">
+        <div class="gift-box">
+          <div class="gift-base"></div>
+          <div class="gift-ribbon-v"></div>
+          <div class="gift-lid"></div>
+        </div>
+        <span class="gift-hint">tap to open</span>
+        <p class="gift-msg" data-msg="A small houseplant of appreciation, delivered digitally. Water it with naps and good snacks. 🌿"></p>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============================= FORTUNE WHEEL ============================= -->
+  <section class="tight" id="fortune">
+    <div class="leaf-divider reveal">🌿 one more game</div>
+    <div class="reveal" style="margin-top:34px;">
+      <span class="eyebrow sage">🍀 spin it</span>
+      <h2 class="section-title">Give the birthday fortune wheel a spin</h2>
+      <p class="section-sub">Purely scientific. Extremely accurate. Ask again if you don't like the answer.</p>
+    </div>
+
+    <div class="wheel-stage reveal">
+      <div class="wheel-wrap">
+        <div class="wheel-pointer" aria-hidden="true"></div>
+        <div class="wheel" id="wheel">
+          <div class="wheel-hub">🎯</div>
+        </div>
+      </div>
+      <div class="wheel-info">
+        <button class="spin-btn" id="spinBtn" type="button">Spin the wheel</button>
+        <div class="fortune-result" id="fortuneResult">
+          <span class="ftitle">Your fortune</span>
+          <span id="fortuneText">—</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= PIÑATA ============================= -->
+  <section class="tight" id="pinata-section">
+    <div class="reveal">
+      <span class="eyebrow sage">🪅 last game, promise</span>
+      <h2 class="section-title">Crack the piñata</h2>
+      <p class="section-sub">It's rigged in your favor. Keep clicking.</p>
+    </div>
+
+    <div class="pinata-stage reveal">
+      <button class="pinata-btn" id="pinataBtn" type="button" aria-label="Hit the piñata">🪅</button>
+      <div class="hit-track"><div class="hit-fill" id="hitFill"></div></div>
+      <p class="pinata-hint" id="pinataHint">tap it a few times</p>
+      <p class="pinata-message" id="pinataMessage">Jackpot. Turns out it was full of confetti and good wishes the whole time. 🌿</p>
     </div>
   </section>
 
@@ -816,7 +1373,7 @@
     <h2 class="section-title" style="margin:0 auto;">However you spend today, I hope it's a good one</h2>
     <p class="section-sub">One more for the road.</p>
     <button class="finale-btn" id="finaleBtn">Send one more surprise 🎉</button>
-    <p class="signature">Made with love (and way too much CSS), just for you. 🎂</p>
+    <p class="signature">Made with love <span class="leaf">(and way too much CSS and sage green) 🌿</span>, just for you. 🎂</p>
   </section>
 
 </div>
@@ -849,7 +1406,7 @@
   window.addEventListener('resize', resize);
   resize();
 
-  var COLORS = ['#ff4d8d', '#ffc94d', '#35dfc0', '#ff7a45', '#8c6fe6'];
+  var COLORS = ['#ff4d8d', '#ffc94d', '#35dfc0', '#ff7a45', '#8c6fe6', '#9CAF88'];
   var particles = [];
 
   function spawnParticle(x, y, burst){
@@ -911,6 +1468,58 @@
     burstConfetti(window.innerWidth / 2, window.innerHeight * 0.3, 90);
     playChime(494);
   });
+
+  /* ---------------------------------------------------------------
+     Cursor sparkle trail — small sage/gold sparkles that follow
+     the pointer, throttled so it stays subtle rather than busy
+  --------------------------------------------------------------- */
+  var sparkleCanvas = document.getElementById('sparkle-canvas');
+  var sctx = sparkleCanvas.getContext('2d');
+  var SW, SH;
+  function sresize(){ SW = sparkleCanvas.width = window.innerWidth; SH = sparkleCanvas.height = window.innerHeight; }
+  window.addEventListener('resize', sresize);
+  sresize();
+
+  var sparkles = [];
+  var SPARK_COLORS = ['#9CAF88', '#cddabd', '#ffc94d'];
+  var lastSparkTime = 0;
+
+  if (!reduceMotion && window.matchMedia && window.matchMedia('(hover:hover)').matches){
+    document.addEventListener('mousemove', function(e){
+      var now = performance.now();
+      if (now - lastSparkTime < 40) return;
+      lastSparkTime = now;
+      sparkles.push({
+        x: e.clientX, y: e.clientY,
+        size: Math.random() * 3 + 2,
+        color: SPARK_COLORS[Math.floor(Math.random() * SPARK_COLORS.length)],
+        life: 0,
+        maxLife: 34,
+        vy: -0.4 - Math.random() * 0.4
+      });
+      if (sparkles.length > 60) sparkles.shift();
+    });
+  }
+
+  function sparkTick(){
+    sctx.clearRect(0, 0, SW, SH);
+    for (var i = sparkles.length - 1; i >= 0; i--){
+      var s = sparkles[i];
+      s.life++;
+      s.y += s.vy;
+      var t = s.life / s.maxLife;
+      if (t >= 1){ sparkles.splice(i, 1); continue; }
+      sctx.save();
+      sctx.globalAlpha = 1 - t;
+      sctx.fillStyle = s.color;
+      sctx.beginPath();
+      sctx.arc(s.x, s.y, s.size * (1 - t * 0.5), 0, Math.PI * 2);
+      sctx.fill();
+      sctx.restore();
+    }
+    requestAnimationFrame(sparkTick);
+  }
+  sparkTick();
 
   /* ---------------------------------------------------------------
      Soft chime sounds (Web Audio API — no external audio files)
@@ -981,6 +1590,35 @@
   }
 
   /* ---------------------------------------------------------------
+     Poppable hero balloons — click to pop with a confetti burst,
+     then they quietly respawn so the hero stays lively
+  --------------------------------------------------------------- */
+  var popCount = 0;
+  var popCounterEl = document.getElementById('popCounter');
+  var BALLOON_COLORS = ['pink', 'gold', 'turq', 'tang', 'sage'];
+
+  document.querySelectorAll('[data-pop]').forEach(function(balloon){
+    balloon.addEventListener('click', function(e){
+      e.stopPropagation();
+      if (balloon.classList.contains('popped')) return;
+      var r = balloon.getBoundingClientRect();
+      balloon.classList.add('popped');
+      burstConfetti(r.left + r.width / 2, r.top + r.height / 2, 30);
+      playChime(700 + Math.random() * 150);
+
+      popCount++;
+      popCounterEl.textContent = '🎈 ' + popCount + ' balloon' + (popCount === 1 ? '' : 's') + ' popped — nice reflexes';
+      popCounterEl.classList.add('show');
+
+      setTimeout(function(){
+        var newColor = BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)];
+        balloon.className = 'balloon ' + newColor;
+        balloon.setAttribute('data-pop', '');
+      }, 1400);
+    });
+  });
+
+  /* ---------------------------------------------------------------
      Scroll cue
   --------------------------------------------------------------- */
   document.getElementById('scrollCue').addEventListener('click', function(){
@@ -1021,7 +1659,6 @@
   --------------------------------------------------------------- */
   if (!reduceMotion){
     document.querySelectorAll('.wish-card').forEach(function(card){
-      var baseRotate = card.style.transform;
       card.addEventListener('mousemove', function(e){
         var r = card.getBoundingClientRect();
         var px = (e.clientX - r.left) / r.width;
@@ -1052,14 +1689,18 @@
   var lightboxImg = document.getElementById('lightboxImg');
   var lightboxCaption = document.getElementById('lightboxCaption');
 
+  function openLightbox(src, alt, caption){
+    lightboxImg.src = src.replace('/400/400', '/900/900').replace('/300/300', '/900/900');
+    lightboxImg.alt = alt || '';
+    lightboxCaption.textContent = caption || '';
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
   document.querySelectorAll('.polaroid').forEach(function(fig){
     fig.addEventListener('click', function(){
       var img = fig.querySelector('img');
-      lightboxImg.src = img.src.replace('/400/400', '/900/900');
-      lightboxImg.alt = img.alt;
-      lightboxCaption.textContent = fig.dataset.caption || '';
-      lightbox.classList.add('open');
-      document.body.style.overflow = 'hidden';
+      openLightbox(img.src, img.alt, fig.dataset.caption || '');
     });
   });
 
@@ -1075,6 +1716,149 @@
   });
 
   /* ---------------------------------------------------------------
+     FRIENDS' ALBUM DATA — swap in real photos and real messages.
+     "seed" builds a placeholder photo URL; replace with a real
+     image URL in "photo" to use an actual picture instead.
+  --------------------------------------------------------------- */
+  var FRIENDS = [
+    {
+      name: 'Priya',
+      rel: 'roommate, 2019–2021',
+      seed: 'friend-priya',
+      alt: 'Photo shared by Priya',
+      message: "Remember when we said we'd only stay for 'one drink'? Neither of us has ever once, in the history of us, left after one drink. Happiest birthday to my favorite bad influence."
+    },
+    {
+      name: 'Sam',
+      rel: 'college roommate',
+      seed: 'friend-sam',
+      alt: 'Photo shared by Sam',
+      message: "You were the only person who'd study with me at 2am and somehow make it fun. A decade later and you're still the friend I call first with good news. Love you, happy birthday."
+    },
+    {
+      name: 'Jordan',
+      rel: 'work bestie',
+      seed: 'friend-jordan',
+      alt: 'Photo shared by Jordan',
+      message: "You made a genuinely stressful job feel survivable, mostly through excellent snack sharing and even better commentary. Here's to another year of us surviving Mondays together."
+    },
+    {
+      name: 'Mia',
+      rel: 'since we were 8',
+      seed: 'friend-mia',
+      alt: 'Photo shared by Mia',
+      message: "We've known each other longer than we haven't, which is a wild thing to realize. Thanks for being exactly the same amazing person you were at eight, just with better taste in shoes."
+    },
+    {
+      name: 'Chris',
+      rel: 'hiking buddy',
+      seed: 'friend-chris',
+      alt: 'Photo shared by Chris',
+      message: "This is still the best view I've ever had, and you insisted we take the 'hard' trail just to prove a point. Worth it. Can't wait for wherever we get lost next."
+    },
+    {
+      name: 'Taylor',
+      rel: 'the group chat',
+      seed: 'friend-taylor',
+      alt: 'Photo shared by Taylor',
+      message: "You're the reason our group chat has 400 unread messages at any given time and honestly it's the highlight of my day. Happy birthday to the glue that holds us all together."
+    }
+  ];
+
+  var albumIndex = 0;
+  var albumEls = {
+    spread: document.getElementById('albumSpread'),
+    photo: document.getElementById('albumPhoto'),
+    caption: document.getElementById('albumPhotoCaption'),
+    count: document.getElementById('albumCount'),
+    message: document.getElementById('albumMessage'),
+    avatar: document.getElementById('albumAvatar'),
+    name: document.getElementById('albumName'),
+    rel: document.getElementById('albumRel'),
+    dots: document.getElementById('albumDots'),
+    prev: document.getElementById('albumPrev'),
+    next: document.getElementById('albumNext'),
+    photoCard: document.getElementById('albumPhotoCard')
+  };
+
+  FRIENDS.forEach(function(_, i){
+    var dot = document.createElement('button');
+    dot.className = 'album-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', 'Go to message ' + (i + 1) + ' of ' + FRIENDS.length);
+    dot.addEventListener('click', function(){ renderAlbum(i, i > albumIndex ? 1 : -1); });
+    albumEls.dots.appendChild(dot);
+  });
+
+  function renderAlbum(index, direction){
+    index = ((index % FRIENDS.length) + FRIENDS.length) % FRIENDS.length;
+    var f = FRIENDS[index];
+    albumIndex = index;
+
+    function paint(){
+      albumEls.photo.src = f.photo || ('https://picsum.photos/seed/' + f.seed + '/400/400');
+      albumEls.photo.alt = f.alt || ('Photo from ' + f.name);
+      albumEls.caption.textContent = 'from ' + f.name;
+      albumEls.count.textContent = (index + 1) + ' / ' + FRIENDS.length;
+      albumEls.message.textContent = f.message;
+      albumEls.avatar.textContent = f.name.charAt(0);
+      albumEls.name.textContent = f.name;
+      albumEls.rel.textContent = f.rel || '';
+      Array.prototype.forEach.call(albumEls.dots.children, function(d, i){
+        d.classList.toggle('active', i === index);
+      });
+    }
+
+    if (reduceMotion){
+      paint();
+      return;
+    }
+
+    albumEls.spread.style.setProperty('--slide', (direction < 0 ? 18 : -18) + 'px');
+    albumEls.spread.classList.remove('anim-in');
+    albumEls.spread.classList.add('anim-out');
+    setTimeout(function(){
+      paint();
+      albumEls.spread.classList.remove('anim-out');
+      albumEls.spread.classList.add('anim-in');
+    }, 220);
+  }
+
+  albumEls.prev.addEventListener('click', function(){ renderAlbum(albumIndex - 1, -1); playChime(392); });
+  albumEls.next.addEventListener('click', function(){ renderAlbum(albumIndex + 1, 1); playChime(440); });
+
+  albumEls.photoCard.addEventListener('click', function(){
+    var f = FRIENDS[albumIndex];
+    var src = f.photo || ('https://picsum.photos/seed/' + f.seed + '/400/400');
+    openLightbox(src, albumEls.photo.alt, '"' + f.message + '" — ' + f.name);
+  });
+  albumEls.photoCard.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      albumEls.photoCard.click();
+    }
+  });
+
+  document.getElementById('friends-album').addEventListener('keydown', function(e){
+    if (e.key === 'ArrowLeft') albumEls.prev.click();
+    if (e.key === 'ArrowRight') albumEls.next.click();
+  });
+
+  var albumTouchStartX = null;
+  albumEls.spread.addEventListener('touchstart', function(e){
+    albumTouchStartX = e.changedTouches[0].clientX;
+  }, { passive: true });
+  albumEls.spread.addEventListener('touchend', function(e){
+    if (albumTouchStartX === null) return;
+    var dx = e.changedTouches[0].clientX - albumTouchStartX;
+    if (Math.abs(dx) > 40){
+      if (dx < 0) albumEls.next.click(); else albumEls.prev.click();
+    }
+    albumTouchStartX = null;
+  }, { passive: true });
+
+  renderAlbum(0, 1);
+
+  /* ---------------------------------------------------------------
      Gift boxes
   --------------------------------------------------------------- */
   document.querySelectorAll('.gift').forEach(function(box){
@@ -1088,6 +1872,187 @@
       playChime(587);
     });
   });
+
+  /* ---------------------------------------------------------------
+     Fortune wheel — spins to a random slice and reveals a fortune
+     that matches the color it lands on
+  --------------------------------------------------------------- */
+  var FORTUNES = [
+    { color: 'sage',      angle: 30,  text: 'This is the year you finally water the plants on schedule. Growth, but make it literal.' },
+    { color: 'pink',      angle: 90,  text: 'A ridiculous amount of good luck is headed your way, mostly disguised as small coincidences.' },
+    { color: 'gold',      angle: 150, text: 'Someone is going to compliment your taste this week and you should just say thank you, no deflecting.' },
+    { color: 'turquoise', angle: 210, text: 'A plan you almost talked yourself out of turns out to be the best decision of the season.' },
+    { color: 'tangerine', angle: 270, text: 'Cake for breakfast is scientifically endorsed at least once this year. You\'re welcome.' },
+    { color: 'violet',    angle: 330, text: 'You will make someone\'s day without even trying. You do that a lot, actually.' }
+  ];
+
+  var wheelEl = document.getElementById('wheel');
+  var spinBtn = document.getElementById('spinBtn');
+  var fortuneResult = document.getElementById('fortuneResult');
+  var fortuneText = document.getElementById('fortuneText');
+  var currentRotation = 0;
+  var spinning = false;
+
+  spinBtn.addEventListener('click', function(){
+    if (spinning) return;
+    spinning = true;
+    spinBtn.disabled = true;
+    fortuneResult.classList.remove('show');
+
+    var pick = FORTUNES[Math.floor(Math.random() * FORTUNES.length)];
+    var fullSpins = 4 + Math.floor(Math.random() * 3);
+    var target = fullSpins * 360 + (360 - pick.angle);
+    currentRotation += target;
+
+    wheelEl.style.transform = 'rotate(' + currentRotation + 'deg)';
+    playChime(440);
+
+    setTimeout(function(){
+      fortuneText.textContent = pick.text;
+      fortuneResult.classList.add('show');
+      var r = wheelEl.getBoundingClientRect();
+      burstConfetti(r.left + r.width / 2, r.top + r.height / 2, 80);
+      playChime(659);
+      spinning = false;
+      spinBtn.disabled = false;
+    }, 3700);
+  });
+
+  /* ---------------------------------------------------------------
+     Reaction dock — sends a floating emoji up from the button
+  --------------------------------------------------------------- */
+  document.querySelectorAll('.reaction-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var r = btn.getBoundingClientRect();
+      var el = document.createElement('div');
+      el.className = 'floating-reaction';
+      el.textContent = btn.dataset.emoji;
+      el.style.left = (r.left + r.width / 2 - 12) + 'px';
+      el.style.top = (r.top) + 'px';
+      el.style.setProperty('--drift', ((Math.random() - 0.5) * 120) + 'px');
+      el.style.setProperty('--spin', ((Math.random() - 0.5) * 60) + 'deg');
+      document.body.appendChild(el);
+      playChime(520 + Math.random() * 120);
+      setTimeout(function(){ el.remove(); }, 2700);
+    });
+  });
+
+  /* ---------------------------------------------------------------
+     Age guess slider
+  --------------------------------------------------------------- */
+  var ageSlider = document.getElementById('ageSlider');
+  var guessValue = document.getElementById('guessValue');
+  var lockBtn = document.getElementById('lockBtn');
+  var guessResponse = document.getElementById('guessResponse');
+
+  function ageLabel(v){
+    if (v < 18) return 'not legally responsible for anything yet';
+    if (v < 30) return 'years young, allegedly';
+    if (v < 45) return 'years of excellent decision-making';
+    if (v < 65) return 'years of well-earned wisdom';
+    return 'years of pure, distilled legend';
+  }
+
+  function updateSlider(){
+    var v = parseInt(ageSlider.value, 10);
+    var pct = ((v - ageSlider.min) / (ageSlider.max - ageSlider.min)) * 100;
+    ageSlider.style.setProperty('--fill', pct + '%');
+    guessValue.innerHTML = v + '<span>' + ageLabel(v) + '</span>';
+    guessResponse.classList.remove('show');
+  }
+  ageSlider.addEventListener('input', updateSlider);
+  updateSlider();
+
+  var AGE_RESPONSES = [
+    "Sure, let's go with that number. No follow-up questions here.",
+    "Bold pick. Confident. Respect.",
+    "That number and I both agree: doesn't matter, cake still counts.",
+    "Locked. Notarized. Legally binding as of right now.",
+    "Whatever the real number is, it looks great on you."
+  ];
+  lockBtn.addEventListener('click', function(){
+    guessResponse.textContent = AGE_RESPONSES[Math.floor(Math.random() * AGE_RESPONSES.length)];
+    guessResponse.classList.add('show');
+    var r = lockBtn.getBoundingClientRect();
+    burstConfetti(r.left + r.width / 2, r.top, 40);
+    playChime(600);
+  });
+
+  /* ---------------------------------------------------------------
+     Crack the piñata — a few clicks to shake it, then it breaks
+     into a candy rain and a bonus message
+  --------------------------------------------------------------- */
+  var pinataBtn = document.getElementById('pinataBtn');
+  var hitFill = document.getElementById('hitFill');
+  var pinataHint = document.getElementById('pinataHint');
+  var pinataMessage = document.getElementById('pinataMessage');
+  var HITS_NEEDED = 5;
+  var hits = 0;
+  var broken = false;
+  var CANDY = ['🍬', '🍭', '🍫', '✨', '🌿'];
+
+  function candyRain(originX){
+    var count = reduceMotion ? 0 : 26;
+    for (var i = 0; i < count; i++){
+      (function(i){
+        setTimeout(function(){
+          var c = document.createElement('div');
+          c.className = 'candy';
+          c.textContent = CANDY[Math.floor(Math.random() * CANDY.length)];
+          c.style.left = (originX + (Math.random() - 0.5) * 260) + 'px';
+          c.style.animationDuration = (1.6 + Math.random() * 1.2) + 's';
+          document.body.appendChild(c);
+          setTimeout(function(){ c.remove(); }, 3000);
+        }, i * 35);
+      })(i);
+    }
+  }
+
+  pinataBtn.addEventListener('click', function(){
+    if (broken) return;
+    hits++;
+    hitFill.style.width = Math.min(100, (hits / HITS_NEEDED) * 100) + '%';
+    pinataBtn.classList.remove('shake');
+    void pinataBtn.offsetWidth;
+    pinataBtn.classList.add('shake');
+    playChime(300 + hits * 40);
+
+    if (hits < HITS_NEEDED){
+      pinataHint.textContent = (HITS_NEEDED - hits) + ' more good hit' + (HITS_NEEDED - hits === 1 ? '' : 's') + '...';
+    } else {
+      broken = true;
+      pinataBtn.classList.add('broken');
+      pinataHint.style.opacity = '0';
+      var r = pinataBtn.getBoundingClientRect();
+      burstConfetti(r.left + r.width / 2, r.top + r.height / 2, 120);
+      candyRain(r.left + r.width / 2);
+      playChime(784);
+      setTimeout(function(){ pinataMessage.classList.add('show'); }, 300);
+    }
+  });
+
+  /* ---------------------------------------------------------------
+     Hero title easter egg — a few extra clicks on the name
+     unlocks one last burst, just because
+  --------------------------------------------------------------- */
+  var titleClicks = 0;
+  var titleUnlocked = false;
+  heroTitle.addEventListener('click', function(e){
+    if (titleUnlocked) return;
+    titleClicks++;
+    if (titleClicks >= 5){
+      titleUnlocked = true;
+      burstConfetti(window.innerWidth / 2, window.innerHeight * 0.25, 140);
+      playChime(880);
+      showToastEarly('🌿 okay, that\'s the secret extra confetti. Happy birthday.');
+    }
+  });
+  function showToastEarly(text){
+    var toast = document.getElementById('toast');
+    toast.textContent = text;
+    toast.classList.add('show');
+    setTimeout(function(){ toast.classList.remove('show'); }, 2600);
+  }
 
   /* ---------------------------------------------------------------
      Scroll reveal
@@ -1121,7 +2086,7 @@
     for (var i = 0; i < count; i++){
       var heart = document.createElement('div');
       heart.className = 'floating-heart';
-      heart.textContent = ['💛','🎈','✨'][i % 3];
+      heart.textContent = ['💚','🎈','✨'][i % 3];
       heart.style.left = (Math.random() * 96) + 'vw';
       heart.style.animationDuration = (4 + Math.random() * 3) + 's';
       document.body.appendChild(heart);
