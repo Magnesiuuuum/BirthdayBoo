@@ -19,6 +19,9 @@
   7. Swap the 6 entries in the FRIENDS array (in the script, near
      "FRIENDS' ALBUM DATA") for real photos and real messages from
      real friends.
+  8. Edit the closing message in "FINAL CHECK-IN" (the "Are you
+     happy today?" question near the very end) to say what you want
+     it to say once they click Yes.
   Everything else (animations, confetti, sounds, sparkle trail,
   poppable balloons, reaction dock) will just work.
   ══════════════════════════════════════════════════════════════
@@ -1540,6 +1543,102 @@
   }
   .signature .leaf{ color:var(--sage); }
 
+  /* ---- final check-in: "are you happy today?" ---- */
+  .final-check{
+    text-align:center;
+    padding:50px 24px 60px;
+  }
+  .final-check .section-title{ margin:0 auto 6px; }
+  .final-check .section-sub{ margin-left:auto; margin-right:auto; }
+
+  .check-buttons{
+    margin-top:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:22px;
+    flex-wrap:wrap;
+    min-height:110px;
+  }
+  .check-btn{
+    border:none;
+    border-radius:100px;
+    font-family:var(--font-display);
+    font-weight:700;
+    cursor:pointer;
+    will-change:transform;
+  }
+  .yes-btn{
+    background:linear-gradient(135deg, var(--turquoise), var(--sage));
+    color:#0f2419;
+    font-size:18px;
+    padding:16px 38px;
+    box-shadow:0 16px 34px rgba(53,223,192,.35);
+    transition:transform .35s cubic-bezier(.3,1.6,.4,1), box-shadow .3s ease, filter .2s ease;
+    transform:scale(1);
+  }
+  .yes-btn:hover{ filter:brightness(1.06); }
+  .yes-btn:active{ filter:brightness(.94); }
+  .yes-btn.locked{ pointer-events:none; }
+
+  .no-btn{
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.28);
+    color:var(--cream);
+    font-size:16px;
+    padding:14px 30px;
+    transform:scale(1);
+  }
+  .no-btn:hover{ background:rgba(255,255,255,.16); }
+  .no-btn.gone{
+    opacity:0;
+    transform:scale(.6) !important;
+    transition:opacity .35s ease, transform .35s ease;
+    pointer-events:none;
+  }
+
+  .check-nudge{
+    margin-top:22px;
+    min-height:20px;
+    font-size:14px;
+    font-weight:700;
+    color:var(--sage-light);
+    opacity:0;
+    transition:opacity .3s ease;
+  }
+  .check-nudge.show{ opacity:1; }
+
+  .final-message{
+    max-width:560px;
+    margin:0 auto;
+    overflow:hidden;
+    max-height:0;
+    opacity:0;
+    transition:max-height .8s ease, opacity .6s ease, margin-top .6s ease;
+  }
+  .final-message.show{
+    max-height:600px;
+    opacity:1;
+    margin-top:40px;
+  }
+  .final-message-inner{
+    background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+    border:1px solid rgba(255,201,77,.35);
+    border-radius:var(--radius-lg);
+    padding:34px clamp(22px,4vw,44px);
+  }
+  .final-emoji{ font-size:34px; display:block; margin-bottom:14px; }
+  .final-message-inner p{
+    font-size:17.5px; line-height:1.75; color:var(--cream);
+  }
+  .final-sign{
+    display:block; margin-top:18px;
+    font-family:var(--font-display); font-size:15px; color:var(--gold);
+  }
+  @media (max-width:480px){
+    .check-buttons{ gap:16px; }
+  }
+
   .floating-heart{
     position:fixed; bottom:-40px; z-index:60;
     font-size:22px; pointer-events:none;
@@ -2077,6 +2176,28 @@
     <p class="section-sub">One more for the road.</p>
     <button class="finale-btn" id="finaleBtn">Send one more surprise 🎉</button>
     <p class="signature">Made with love <span class="leaf">(and way too much CSS and sage green) 🌿</span>, just for you. 🎂</p>
+  </section>
+
+  <!-- ============================= FINAL CHECK-IN ============================= -->
+  <section class="final-check reveal" id="finalCheck">
+    <span class="eyebrow">💛 one truly last thing</span>
+    <h2 class="section-title" style="margin:0 auto;">Are you happy today?</h2>
+    <p class="section-sub">Be honest — actually, do not. Just click yes.</p>
+
+    <div class="check-buttons" id="checkButtons">
+      <button class="check-btn yes-btn" id="yesBtn" type="button">Yes</button>
+      <button class="check-btn no-btn" id="noBtn" type="button">No</button>
+    </div>
+
+    <p class="check-nudge" id="checkNudge" aria-live="polite"></p>
+
+    <div class="final-message" id="finalMessage" aria-live="polite">
+      <div class="final-message-inner">
+        <span class="final-emoji">🎂</span>
+        <p>Good. That's exactly how today should feel. Whatever's made it that way — hold onto it, and let the rest of today just be yours, start to finish. I'm so glad you're having a good one. Happy birthday, Vea. I mean every single word on this page, and I hope this year is the best one yet.</p>
+        <span class="final-sign">— with all my love, today and every day after 💛</span>
+      </div>
+    </div>
   </section>
 
 </div>
@@ -3538,6 +3659,82 @@
     playChime(523);
     showToast('🎉 Happy birthday, Vea — go have the best day.');
   });
+
+  /* ---------------------------------------------------------------
+     Final check-in — "Are you happy today?" Yes is the only answer
+     that's accepted: No just dodges away with a little recoil (like
+     it's turning its back on the question), gets a playful rebuff,
+     and makes Yes grow a bit bigger — every single time it's clicked.
+  --------------------------------------------------------------- */
+  (function(){
+    var yesBtn = document.getElementById('yesBtn');
+    var noBtn = document.getElementById('noBtn');
+    var checkButtons = document.getElementById('checkButtons');
+    var checkNudge = document.getElementById('checkNudge');
+    var finalMessage = document.getElementById('finalMessage');
+    if (!yesBtn || !noBtn || !checkButtons) return;
+
+    var REJECT_LINES = [
+      'Rude. Try again.',
+      'The "no" button does not want to cooperate.',
+      'Nice try — it is dodging on purpose now.',
+      'At this point, yes is just going to keep growing.',
+      'The "no" button has officially given up. Click yes.',
+      'Still not an option. Yes is right there though.'
+    ];
+
+    var noClicks = 0;
+    var MAX_SCALE = 2.05;
+
+    function growYes(){
+      var scale = Math.min(1 + noClicks * 0.16, MAX_SCALE);
+      yesBtn.style.transform = 'scale(' + scale.toFixed(2) + ')';
+    }
+
+    function showNudge(){
+      var idx = Math.min(noClicks - 1, REJECT_LINES.length - 1);
+      checkNudge.textContent = REJECT_LINES[idx];
+      checkNudge.classList.add('show');
+    }
+
+    noBtn.addEventListener('click', function(){
+      noClicks++;
+      growYes();
+      showNudge();
+      playChime(320);
+      setTimeout(function(){ playChime(220); }, 130);
+      if (navigator.vibrate) navigator.vibrate(25);
+
+      // quick recoil (as if it's flinching / turning away from the
+      // question), then a hop to a new spot nearby to keep dodging
+      var rect = checkButtons.getBoundingClientRect();
+      var maxX = Math.max(50, Math.min(150, rect.width * 0.36));
+      noBtn.style.transition = 'transform .14s ease-in';
+      noBtn.style.transform = 'scale(.82) rotate(' + (Math.random() > 0.5 ? -22 : 22) + 'deg)';
+      setTimeout(function(){
+        var dx = (Math.random() * 2 - 1) * maxX;
+        var dy = (Math.random() * 2 - 1) * 30;
+        var rot = (Math.random() * 24 - 12);
+        noBtn.style.transition = 'transform .4s cubic-bezier(.3,1.7,.35,1)';
+        noBtn.style.transform = 'translate(' + dx.toFixed(0) + 'px,' + dy.toFixed(0) + 'px) rotate(' + rot.toFixed(0) + 'deg) scale(1)';
+      }, 140);
+    });
+
+    yesBtn.addEventListener('click', function(){
+      if (yesBtn.classList.contains('locked')) return;
+      yesBtn.classList.add('locked');
+      noBtn.classList.add('gone');
+      checkNudge.classList.remove('show');
+      burstConfetti(window.innerWidth / 2, window.innerHeight * 0.4, 130);
+      spawnHearts();
+      playChime(880);
+      if (navigator.vibrate) navigator.vibrate([30, 20, 30, 20, 60]);
+      finalMessage.classList.add('show');
+      setTimeout(function(){
+        finalMessage.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+      }, 250);
+    });
+  })();
 
   /* ---------------------------------------------------------------
      Moon easter egg — click it for a shooting star; click it a
