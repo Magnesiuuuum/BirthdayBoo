@@ -3562,8 +3562,19 @@
   });
 
   /* ---------------------------------------------------------------
-     Konami code easter egg — the classic, for anyone who tries it
+     Konami code easter egg — the classic, for anyone who tries it.
+     konamiUnlock() is shared with the swipe-pattern version for
+     touch/mobile devices, over in MOBILE EASTER EGGS below.
   --------------------------------------------------------------- */
+  function konamiUnlock(){
+    burstConfetti(window.innerWidth * 0.5, window.innerHeight * 0.2, 200);
+    burstConfetti(window.innerWidth * 0.1, window.innerHeight * 0.5, 100);
+    burstConfetti(window.innerWidth * 0.9, window.innerHeight * 0.5, 100);
+    spawnHearts();
+    playChime(988);
+    if (navigator.vibrate) navigator.vibrate([30, 40, 30, 40, 60]);
+    showToast('🎮 Konami code unlocked. Bonus confetti storm, obviously.');
+  }
   var KONAMI_CODE = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
   var konamiProgress = 0;
   document.addEventListener('keydown', function(e){
@@ -3572,12 +3583,7 @@
       konamiProgress++;
       if (konamiProgress === KONAMI_CODE.length){
         konamiProgress = 0;
-        burstConfetti(window.innerWidth * 0.5, window.innerHeight * 0.2, 200);
-        burstConfetti(window.innerWidth * 0.1, window.innerHeight * 0.5, 100);
-        burstConfetti(window.innerWidth * 0.9, window.innerHeight * 0.5, 100);
-        spawnHearts();
-        playChime(988);
-        showToast('🎮 Konami code unlocked. Bonus confetti storm, obviously.');
+        konamiUnlock();
       }
     } else {
       konamiProgress = (key === KONAMI_CODE[0]) ? 1 : 0;
@@ -3587,8 +3593,16 @@
   /* ---------------------------------------------------------------
      Type the birthday name — a tiny hidden listener that notices
      if someone types the name from the headline (skips input fields
-     so it never fires while writing a wish or note)
+     so it never fires while writing a wish or note). Phones don't
+     have a keyboard, so nameFoundCelebration() is reused by a
+     triple-tap-the-headline version down in MOBILE EASTER EGGS.
   --------------------------------------------------------------- */
+  function nameFoundCelebration(){
+    spawnHearts();
+    playChime(740);
+    if (navigator.vibrate) navigator.vibrate(60);
+    showToast('💚 Someone found the name. Hi. 👋');
+  }
   (function(){
     var targetName = (heroTitle.textContent || '').replace(/[^a-zA-Z]/g, '').toLowerCase();
     var nameGuess = 'vea'; // fallback if the headline text can't be parsed
@@ -3603,11 +3617,131 @@
       typedBuffer = (typedBuffer + e.key.toLowerCase()).slice(-20);
       if (typedBuffer.indexOf(needle) !== -1){
         typedBuffer = '';
-        spawnHearts();
-        playChime(740);
-        showToast('💚 Someone typed the name. Hi. 👋');
+        nameFoundCelebration();
       }
     });
+  })();
+
+  /* ---------------------------------------------------------------
+     MOBILE EASTER EGGS — touch-only equivalents of the eggs above,
+     since phones and tablets have no keyboard to type on or arrow
+     keys to press. All reuse the same confetti/toast/sound helpers
+     so they feel consistent with the desktop versions, plus a
+     little haptic buzz (navigator.vibrate) where it's supported.
+  --------------------------------------------------------------- */
+
+  /* Triple-tap the headline — the touch version of "type the name" */
+  (function(){
+    var tapTimes = [];
+    var startX = 0, startY = 0;
+    heroTitle.addEventListener('touchstart', function(e){
+      var t = e.changedTouches[0];
+      startX = t.clientX; startY = t.clientY;
+    }, { passive: true });
+    heroTitle.addEventListener('touchend', function(e){
+      var t = e.changedTouches[0];
+      // ignore drags/scrolls that happen to end on the headline —
+      // only count it if the finger barely moved, i.e. a real tap
+      if (Math.abs(t.clientX - startX) > 12 || Math.abs(t.clientY - startY) > 12) return;
+      var now = Date.now();
+      tapTimes.push(now);
+      tapTimes = tapTimes.filter(function(time){ return now - time < 900; });
+      if (tapTimes.length >= 3){
+        tapTimes = [];
+        nameFoundCelebration();
+      }
+    }, { passive: true });
+  })();
+
+  /* Swipe pattern — the touch version of the Konami code: swipe
+     up, up, down, down, left, right, left, right, then two quick
+     taps. Works anywhere on the page, mirroring the keyboard one. */
+  (function(){
+    var PATTERN = ['up','up','down','down','left','right','left','right','tap','tap'];
+    var progress = 0;
+    var startX = 0, startY = 0;
+    document.addEventListener('touchstart', function(e){
+      var t = e.changedTouches[0];
+      startX = t.clientX; startY = t.clientY;
+    }, { passive: true });
+    document.addEventListener('touchend', function(e){
+      var t = e.changedTouches[0];
+      var dx = t.clientX - startX, dy = t.clientY - startY;
+      var adx = Math.abs(dx), ady = Math.abs(dy);
+      var gesture;
+      if (adx < 12 && ady < 12){
+        gesture = 'tap';
+      } else if (Math.max(adx, ady) < 55){
+        return; // too small to call — don't touch the sequence
+      } else if (adx > ady){
+        gesture = dx > 0 ? 'right' : 'left';
+      } else {
+        gesture = dy < 0 ? 'up' : 'down';
+      }
+      if (gesture === PATTERN[progress]){
+        progress++;
+        if (progress === PATTERN.length){
+          progress = 0;
+          konamiUnlock();
+        }
+      } else {
+        progress = (gesture === PATTERN[0]) ? 1 : 0;
+      }
+    }, { passive: true });
+  })();
+
+  /* Shake to celebrate — give the phone an actual shake for a
+     confetti burst and a haptic buzz. iOS 13+ requires a motion
+     permission prompt, which we quietly request on the first touch
+     rather than putting a button on the page for it. */
+  (function(){
+    if (!('DeviceMotionEvent' in window)) return;
+    var last = 0, lastX = null, lastY = null, lastZ = null;
+    var shakeCount = 0, cooling = false;
+    function onShake(){
+      shakeCount++;
+      burstConfetti(window.innerWidth / 2, window.innerHeight * 0.3, 100);
+      spawnHearts();
+      playChime(600);
+      if (navigator.vibrate) navigator.vibrate([40, 30, 40]);
+      showToast(shakeCount === 1
+        ? '📱 Shake detected. Confetti, delivered.'
+        : '🎉 Shake it like you mean it.');
+    }
+    function handleMotion(e){
+      var acc = e.accelerationIncludingGravity || e.acceleration;
+      if (!acc || acc.x === null || acc.x === undefined) return;
+      var now = Date.now();
+      if (now - last < 100) return;
+      var dt = now - last;
+      last = now;
+      if (lastX !== null){
+        var speed = Math.abs(acc.x + acc.y + acc.z - lastX - lastY - lastZ) / dt * 10000;
+        if (speed > 800 && !cooling){
+          cooling = true;
+          onShake();
+          setTimeout(function(){ cooling = false; }, 1400);
+        }
+      }
+      lastX = acc.x; lastY = acc.y; lastZ = acc.z;
+    }
+    function start(){
+      window.addEventListener('devicemotion', handleMotion);
+    }
+    if (typeof DeviceMotionEvent.requestPermission === 'function'){
+      // iOS Safari: must be requested inside a user-gesture handler,
+      // so we piggyback on the first tap anywhere on the page.
+      var asked = false;
+      document.addEventListener('touchend', function ask(){
+        if (asked) return;
+        asked = true;
+        DeviceMotionEvent.requestPermission().then(function(state){
+          if (state === 'granted') start();
+        }).catch(function(){ /* permission denied — no big deal */ });
+      }, { once: true });
+    } else {
+      start();
+    }
   })();
 
   /* ---------------------------------------------------------------
