@@ -5,15 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Happy Birthday, Vea! 🎉</title>
 
+<!--
+  ══════════════════════════════════════════════════════════════
+  HOW TO CUSTOMIZE THIS PAGE
+  1. Search for "Vea" (Ctrl/Cmd+F) and replace with your person's name[cite: 1].
+  2. Scroll to the "MEMORIES" section and swap the <img src="..."> links
+     for your own photos (and update the captions)[cite: 1].
+  3. Edit the wish paragraphs in the "WISHES" section to say what you
+     really want to say[cite: 1].
+  4. Edit the messages hidden inside the gift boxes in "SURPRISES"[cite: 1].
+  5. Edit the facts in "SCRATCH CARDS" / HIGHLIGHTS[cite: 1].
+  6. Edit the fortunes in the "FORTUNE WHEEL" section if you like[cite: 1].
+  7. Swap the entries in the FRIENDS array (in the script) for real photos
+     and messages from real friends[cite: 1].
+  8. Edit the closing message in "FINAL CHECK-IN"[cite: 1].
+  ══════════════════════════════════════════════════════════════
+-->
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
 
 <style>
+  /* ============================= TOKENS ============================= */
   :root{
-    --bg-1:#33422b;
-    --bg-2:#28351f;
-    --bg-3:#171f13;
+    --bg-1:#2b1b22;
+    --bg-2:#1c1218;
+    --bg-3:#0d080b;
     --pink:#ff4d8d;
     --pink-dark:#e63e7a;
     --gold:#ffc94d;
@@ -28,16 +46,23 @@
     --sage-light:#cddabd;
     --cream:#fff6ea;
     --ink:#1c1230;
-    --shadow:rgba(20,10,35,.45);
+    --cake-crust:#f4c07a;
+    --cake-filling:#ff7395;
+    --shadow:rgba(10,5,15,.6);
+    --radius-lg:28px;
+    --radius-md:18px;
+    --radius-sm:10px;
     --font-display:'Baloo 2', system-ui, sans-serif;
     --font-body:'Nunito', system-ui, sans-serif;
   }
 
   *{ box-sizing:border-box; }
-  
+  html{ scroll-behavior:smooth; }
+
   body{
     margin:0;
-    background:#171f13;
+    background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+    background-attachment:fixed;
     color:var(--cream);
     font-family:var(--font-body);
     font-size:17px;
@@ -48,114 +73,194 @@
 
   h1,h2,h3{ font-family:var(--font-display); margin:0; }
   p{ margin:0; }
+  img{ max-width:100%; display:block; }
+  button{ font-family:inherit; cursor:pointer; }
+  a{ color:var(--gold); }
 
-  /* Canvas backgrounds */
-  #confetti-canvas, #sparkle-canvas, #firefly-canvas {
+  :focus-visible{
+    outline:3px solid var(--gold);
+    outline-offset:3px;
+    border-radius:6px;
+  }
+
+  /* Canvas Backdrops */
+  #confetti-canvas, #sparkle-canvas, #firefly-canvas{
     position:fixed; inset:0; width:100%; height:100%;
     pointer-events:none;
   }
-  #firefly-canvas { z-index:-1; }
-  #confetti-canvas { z-index:0; }
-  #sparkle-canvas { z-index:40; }
+  #confetti-canvas{ z-index:10; }
+  #sparkle-canvas{ z-index:40; }
+  #firefly-canvas{ z-index:-1; }
 
-  /* Fixed controls */
+  /* 3D Immersive Cake Wrapper Structure */
+  .cake-world-container {
+    position: relative;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 0;
+  }
+
+  /* Decorative Ambient Frosting Strands running down the page */
+  .cake-drip-sidebar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 32px;
+    background: repeating-linear-gradient(180deg, var(--cream) 0px, var(--cream) 40px, transparent 40px, transparent 80px);
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .cake-drip-left { left: 10px; border-radius: 0 0 20px 20px; }
+  .cake-drip-right { right: 10px; border-radius: 0 0 20px 20px; }
+
+  /* Cake Tier Card Wrapper Styling */
+  .cake-layer-card {
+    position: relative;
+    z-index: 2;
+    margin: 90px auto;
+    padding: 60px 40px 50px;
+    background: linear-gradient(180deg, rgba(255,246,234,0.08) 0%, rgba(255,246,234,0.03) 100%);
+    border-radius: 36px;
+    border: 2px solid rgba(255, 201, 77, 0.2);
+    box-shadow: 0 20px 50px var(--shadow), inset 0 2px 10px rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px);
+  }
+
+  /* Decorative Cake Frosting Header Bar on each section */
+  .cake-layer-card::before {
+    content: '';
+    position: absolute;
+    top: -18px; left: 50%;
+    transform: translateX(-50%);
+    width: 85%; height: 26px;
+    background: var(--cream);
+    border-radius: 20px;
+    box-shadow: 0 6px 16px var(--shadow);
+    background-image: radial-gradient(circle at 10px 10px, var(--pink) 4px, transparent 5px);
+    background-size: 24px 24px;
+  }
+
+  /* ============================= THE FINAL SLICE SECTION ============================= */
+  .slice-stage {
+    position: relative;
+    margin: 140px auto 80px;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .cake-slice-3d {
+    position: relative;
+    width: 100%;
+    max-width: 780px;
+    background: linear-gradient(135deg, #fff2dc 0%, #ffdca8 100%);
+    color: var(--ink);
+    border-radius: 32px 32px 60px 60px;
+    padding: 70px 40px 60px;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.6), inset -12px -12px 25px var(--cake-crust);
+    border: 4px solid var(--gold);
+    overflow: hidden;
+    transform: perspective(1000px) rotateX(4deg);
+    transition: transform 0.5s ease;
+  }
+  .cake-slice-3d:hover {
+    transform: perspective(1000px) rotateX(0deg) scale(1.01);
+  }
+
+  /* Slice Internal Layer Styling */
+  .cake-slice-3d::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 24px;
+    background: var(--pink);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  }
+  .cake-slice-3d::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 18px;
+    background: var(--cake-crust);
+  }
+
+  .slice-filling-stripe {
+    position: absolute;
+    top: 50%; left: 0; right: 0;
+    height: 14px;
+    background: var(--pink-dark);
+    opacity: 0.85;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  /* Controls & Fixed UI */
   .controls{
-    position:fixed; top:18px; right:18px; z-index:50;
-    display:flex; gap:10px;
+    position:fixed; top:18px; right:18px; z-index:50; display:flex; gap:10px;
   }
   .icon-btn{
     width:46px; height:46px; border-radius:50%;
-    border:1px solid rgba(255,255,255,.25);
-    background:rgba(28,18,48,.55); backdrop-filter:blur(8px);
-    color:var(--cream); font-size:20px;
+    border:1px solid rgba(255,255,255,.25); background:rgba(28,18,48,.55);
+    backdrop-filter:blur(8px); color:var(--cream); font-size:20px;
     display:flex; align-items:center; justify-content:center;
-    transition:transform .25s ease; cursor:pointer;
+    transition:transform .25s ease, background .25s ease;
   }
-  .icon-btn:hover{ transform:translateY(-3px) scale(1.06); }
+  .icon-btn:hover{ transform:translateY(-3px) scale(1.06); background:rgba(156,175,136,.4); }
 
-  /* 3D Canvas Stage */
-  #cake-stage-container {
-    position: fixed; inset: 0; width: 100vw; height: 100vh;
-    z-index: 1; pointer-events: none;
+  .reaction-dock{
+    position:fixed; left:18px; bottom:18px; z-index:50; display:flex;
+    flex-direction:column; gap:8px; background:rgba(28,18,48,.55);
+    border:1px solid rgba(156,175,136,.35); backdrop-filter:blur(8px);
+    border-radius:100px; padding:8px;
   }
-
-  /* Scroll Track Scaffolding */
-  .scroll-track {
-    position: relative; z-index: 2; width: 100%;
+  .reaction-btn{
+    width:38px; height:38px; border-radius:50%; border:none;
+    background:rgba(255,255,255,.08); font-size:18px;
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .2s ease;
   }
+  .reaction-btn:hover{ transform:scale(1.15) rotate(-6deg); }
 
-  .cake-section {
-    min-height: 120vh;
-    display: flex; align-items: center; justify-content: flex-start;
-    padding: 0 10vw;
-    pointer-events: none;
-  }
-  .cake-section.right-align { justify-content: flex-end; }
-  .cake-section.center-align { justify-content: center; }
+  /* Section Titles inside Cake Cards */
+  .eyebrow{ display:inline-block; font-weight:800; letter-spacing:.14em; text-transform:uppercase; font-size:13px; color:var(--gold); margin-bottom:14px; }
+  .section-title{ font-size:clamp(30px, 4.5vw, 44px); font-weight:700; color:var(--cream); }
+  .section-sub{ margin-top:10px; color:#e3ead9; font-size:16.5px; }
 
-  .content-card {
-    pointer-events: auto;
-    background: rgba(23, 31, 19, 0.85);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(156, 175, 136, 0.35);
-    border-radius: 28px;
-    padding: 40px;
-    max-width: 500px;
-    box-shadow: 0 20px 50px var(--shadow);
-    transform: translateY(30px);
-    opacity: 0;
-    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
-  }
+  /* Utility Components */
+  .wrap{ max-width:1000px; margin:0 auto; padding:0 20px; position:relative; z-index:2; }
+  .reveal{ opacity:0; transform:translateY(30px); transition:opacity .8s ease, transform .8s ease; }
+  .reveal.in-view{ opacity:1; transform:none; }
 
-  .content-card.in-view {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  /* Grid & Interactive Layouts Retained */
+  .wish-grid, .scratch-grid, .envelope-grid { display:grid; gap:24px; margin-top:40px; }
+  .wish-grid { grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); }
+  .scratch-grid { grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); }
+  .envelope-grid { grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); }
 
-  .eyebrow {
-    font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
-    font-size: 13px; color: var(--gold); margin-bottom: 10px; display: block;
-  }
+  /* Wish & Scratch Cards */
+  .wish-card { background:#fff9ef; color:var(--ink); padding:28px; border-radius:16px; box-shadow:0 10px 25px var(--shadow); }
+  .scratch-card { height:180px; position:relative; border-radius:16px; overflow:hidden; }
+  .scratch-reveal { position:absolute; inset:0; background:var(--violet); color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:15px; text-align:center; }
+  .scratch-canvas { position:absolute; inset:0; width:100%; height:100%; cursor:grab; }
 
-  .section-title {
-    font-size: clamp(28px, 4vw, 38px); font-weight: 700; color: var(--cream);
-    margin-bottom: 14px;
-  }
+  /* Interactive Elements */
+  .slot-card, .corkboard, .guess-card, .love-card { background:rgba(255,255,255,0.05); border-radius:24px; padding:36px; text-align:center; margin-top:30px; }
+  .slot-reels { display:flex; justify-content:center; gap:15px; margin-bottom:20px; }
+  .slot-reel { width:70px; height:70px; background:rgba(255,255,255,0.1); border-radius:14px; font-size:36px; display:flex; align-items:center; justify-content:center; }
 
-  /* Interactive Elements within Slice Section */
-  .slice-card {
-    background: linear-gradient(135deg, rgba(255, 77, 141, 0.15), rgba(255, 201, 77, 0.15));
-    border: 1px solid var(--gold);
-    text-align: center;
-  }
+  /* Final Check Buttons */
+  .check-buttons { display:flex; justify-content:center; gap:20px; margin-top:30px; }
+  .yes-btn { background:var(--turquoise); color:#0f2419; font-weight:800; font-size:18px; padding:14px 36px; border-radius:100px; border:none; transition:transform .2s ease; }
+  .yes-btn:hover { transform:scale(1.05); }
+  .no-btn { background:rgba(0,0,0,0.1); border:1px solid var(--ink); color:var(--ink); font-weight:700; padding:12px 28px; border-radius:100px; }
 
-  .btn-action {
-    margin-top: 20px;
-    border: none;
-    background: linear-gradient(135deg, var(--turquoise), var(--sage));
-    color: var(--ink);
-    font-family: var(--font-display);
-    font-weight: 800; font-size: 16px;
-    padding: 12px 28px; border-radius: 100px;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  .btn-action:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(53,223,192,0.4); }
-
-  /* Slot Machine inline styling */
-  .slot-reels { display: flex; gap: 10px; justify-content: center; margin: 15px 0; }
-  .slot-reel { width: 60px; height: 60px; background: rgba(0,0,0,0.3); border-radius: 12px; font-size: 30px; display: flex; align-items: center; justify-content: center; }
-
-  @media (max-width: 768px) {
-    .cake-section { justify-content: center !important; padding: 0 20px; }
-    .content-card { max-width: 100%; }
+  @media(max-width:768px){
+    .cake-layer-card { padding:40px 20px; margin:60px auto; }
+    .cake-slice-3d { padding:50px 20px 40px; }
   }
 </style>
-
-<!-- Three.js + GSAP dependencies for 3D Camera/Object Animations -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
 <body>
 
@@ -165,320 +270,185 @@
 
 <div class="controls">
   <button class="icon-btn" id="confettiBtn" title="Confetti!">🎉</button>
+  <button class="icon-btn" id="muteBtn" title="Toggle sound">🔊</button>
 </div>
 
-<!-- Fixed 3D Canvas Viewport -->
-<div id="cake-stage-container"></div>
+<div class="reaction-dock">
+  <button class="reaction-btn" data-emoji="🎈">🎈</button>
+  <button class="reaction-btn" data-emoji="💚">💚</button>
+  <button class="reaction-btn" data-emoji="🎂">🎂</button>
+</div>
 
-<!-- Scrollable Content overlaying the 3D scene -->
-<div class="scroll-track">
-  
-  <!-- Hero Section -->
-  <section class="cake-section center-align" id="sec-hero">
-    <div class="content-card in-view" style="text-align: center;">
-      <span class="eyebrow">🎈 Make A Wish</span>
-      <h1 class="section-title">Happy Birthday, Vea!</h1>
-      <p>Scroll down to explore the cake layer by layer...</p>
-    </div>
-  </section>
+<!-- ============================= HERO CAKE STAGE ============================= -->
+<div class="cake-world-container">
+  <div class="cake-drip-sidebar cake-drip-left"></div>
+  <div class="cake-drip-sidebar cake-drip-right"></div>
 
-  <!-- Section 1: Top Layer Wishes -->
-  <section class="cake-section right-align" id="sec-wishes">
-    <div class="content-card">
-      <span class="eyebrow">💌 Top Tier Wishes</span>
-      <h2 class="section-title">A Few Words For You</h2>
-      <p>Another year has found you, and the world is better for it. I hope today feels like good light, easy laughter, and pure magic. Whatever this next chapter brings, may it bring more of what makes you uniquely wonderful.</p>
-    </div>
-  </section>
+  <header class="wrap" style="text-align:center; padding-top:80px;">
+    <span class="eyebrow">🎈 Happy Birthday</span>
+    <h1 style="font-size:clamp(40px, 8vw, 80px);">Happy Birthday, <span style="color:var(--gold);">Vea</span>!</h1>
+    <p class="section-sub" style="max-width:600px; margin:15px auto;">Scroll down to navigate through your birthday cake structure section by section!</p>
+  </header>
 
-  <!-- Section 2: Middle Tier Scratch Cards -->
-  <section class="cake-section left-align" id="sec-scratch">
-    <div class="content-card">
-      <span class="eyebrow">✨ Middle Layer Insights</span>
-      <h2 class="section-title">Hidden Thoughts</h2>
-      <p>The good years aren't the ones without storms—they're the ones where you learned to dance in the rain anyway. Keep showing up, trusting yourself, and celebrating every step along the way.</p>
-    </div>
-  </section>
+  <!-- ============================= LAYER 1: WISHES ============================= -->
+  <main class="wrap">
+    <div class="cake-layer-card reveal" id="wishes">
+      <span class="eyebrow">💌 Tier 1: Wishes</span>
+      <h2 class="section-title">A few things worth saying out loud</h2>
+      <p class="section-sub">Texts get lost. So here's the stuff I actually mean, pinned down where you can find it again[cite: 1].</p>
 
-  <!-- Section 3: Bottom Tier Games -->
-  <section class="cake-section right-align" id="sec-games">
-    <div class="content-card">
-      <span class="eyebrow">🎰 Base Layer Fun</span>
-      <h2 class="section-title">Test Your Birthday Luck</h2>
-      <div class="slot-reels">
-        <div class="slot-reel" id="reel1">🍀</div>
-        <div class="slot-reel" id="reel2">🌤️</div>
-        <div class="slot-reel" id="reel3">🎁</div>
+      <div class="wish-grid">
+        <article class="wish-card">
+          <span style="font-weight:800; color:var(--pink-dark); font-size:12px; text-transform:uppercase;">For the year ahead</span>
+          <p style="margin-top:10px;">Another year has found you, and honestly, the world is a little better for it. I hope today feels exactly like you — good light, easy laughter, and people around you who make it obvious how loved you are[cite: 1].</p>
+          <span style="display:block; margin-top:15px; font-weight:700;">— with love, always</span>
+        </article>
+        <article class="wish-card">
+          <span style="font-weight:800; color:var(--sage-dark); font-size:12px; text-transform:uppercase;">Not-so-serious version</span>
+          <p style="margin-top:10px;">Officially older, allegedly wiser. I won't tell anyone your real age if you don't bring up that one party we agreed to never speak of again[cite: 1]. Deal?</p>
+          <span style="display:block; margin-top:15px; font-weight:700;">— partner in crime</span>
+        </article>
+        <article class="wish-card">
+          <span style="font-weight:800; color:var(--tangerine-dark); font-size:12px; text-transform:uppercase;">Looking forward</span>
+          <p style="margin-top:10px;">May this year bring you soft landings and wide-open doors — the kind of year where good things keep finding you first[cite: 1].</p>
+          <span style="display:block; margin-top:15px; font-weight:700;">— rooting for you</span>
+        </article>
       </div>
-      <button class="btn-action" id="spinBtn">Pull Lever</button>
     </div>
-  </section>
 
-  <!-- Section 4: Final Slice Section (Insides of the Cake Slice) -->
-  <section class="cake-section center-align" id="sec-slice">
-    <div class="content-card slice-card">
-      <span class="eyebrow">🍰 Deep Inside The Heart Of The Cake</span>
-      <h2 class="section-title">The Secret Birthday Note</h2>
-      <p>You made it to the core! Here's the sweetest truth: you deserve all the happiness, growth, and adventures the universe can possibly send your way this year.</p>
-      <button class="btn-action" onclick="triggerMassiveConfetti()">Blow Out Candles & Celebrate! 🕯️</button>
+    <!-- ============================= LAYER 2: SCRATCH CARDS ============================= -->
+    <div class="cake-layer-card reveal" id="scratch-cards">
+      <span class="eyebrow">✨ Tier 2: Scratch Offs</span>
+      <h2 class="section-title">Scratch below the surface</h2>
+      <p class="section-sub">Grab your cursor and scratch off the foil — a little something to carry with you[cite: 1].</p>
+
+      <div class="scratch-grid">
+        <div class="scratch-card">
+          <div class="scratch-reveal">
+            <div style="font-size:30px;">🌤️</div>
+            <strong style="margin-top:5px;">On Life</strong>
+            <p style="font-size:13px; margin-top:5px;">The good years aren't the ones with no storms — they're the ones where you learned to dance in the rain[cite: 1].</p>
+          </div>
+          <canvas class="scratch-canvas"></canvas>
+        </div>
+        <div class="scratch-card">
+          <div class="scratch-reveal">
+            <div style="font-size:30px;">🛠️</div>
+            <strong style="margin-top:5px;">On Work</strong>
+            <p style="font-size:13px; margin-top:5px;">Show up, do the honest work, and trust that consistency quietly outperforms talent[cite: 1].</p>
+          </div>
+          <canvas class="scratch-canvas"></canvas>
+        </div>
+        <div class="scratch-card">
+          <div class="scratch-reveal">
+            <div style="font-size:30px;">🤝</div>
+            <strong style="margin-top:5px;">On Relationships</strong>
+            <p style="font-size:13px; margin-top:5px;">The people who stay through your worst days are the ones worth building your best days around[cite: 1].</p>
+          </div>
+          <canvas class="scratch-canvas"></canvas>
+        </div>
+      </div>
     </div>
-  </section>
 
+    <!-- ============================= LAYER 3: SLOT MACHINE LUCK ============================= -->
+    <div class="cake-layer-card reveal" id="slot-luck">
+      <span class="eyebrow">🎰 Tier 3: Luck Engine</span>
+      <h2 class="section-title">Give your luck a spin</h2>
+      <p class="section-sub">Three reels, one combo, zero real stakes. Pull the lever[cite: 1].</p>
+
+      <div class="slot-card">
+        <div class="slot-reels">
+          <div class="slot-reel" id="slotReelA">🍀</div>
+          <div class="slot-reel" id="slotReelB">🌤️</div>
+          <div class="slot-reel" id="slotReelC">🎁</div>
+        </div>
+        <button class="yes-btn" id="slotSpinBtn" type="button">Pull the lever 🎰</button>
+        <p id="slotResult" style="margin-top:15px; font-weight:700;"></p>
+      </div>
+    </div>
+
+    <!-- ============================= THE LAST PART: WITHIN A SLICE OF CAKE ============================= -->
+    <div class="slice-stage reveal" id="final-slice">
+      <div class="cake-slice-3d">
+        <div class="slice-filling-stripe"></div>
+        <div style="position:relative; z-index:2; text-align:center;">
+          <span class="eyebrow" style="color:var(--pink-dark);">🍰 The Final Slice</span>
+          <h2 class="section-title" style="color:var(--ink);">Final Check-In</h2>
+          <p style="color:#4a3222; font-size:18px; margin-top:10px; font-weight:600;">
+            Are you happy today?
+          </p>
+
+          <div class="check-buttons">
+            <button class="yes-btn" id="yesBtn">YES! 🎉</button>
+            <button class="no-btn" id="noBtn">Maybe?</button>
+          </div>
+
+          <div id="finalMessage" style="margin-top:30px; display:none; background:rgba(255,255,255,0.7); padding:20px; border-radius:18px;">
+            <span style="font-size:32px;">💖</span>
+            <p style="color:var(--ink); font-weight:700; margin-top:10px;">
+              I knew it! Wishing you the happiest birthday ever, Vea. May this slice bring you extra luck and joy all year long[cite: 1]!
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 </div>
 
 <script>
-/* ==========================================================================
-   3D SCENE & IMMERSIVE SCROLL ANIMATION SYSTEM
-   ========================================================================== */
-gsap.registerPlugin(ScrollTrigger);
-
-let scene, camera, renderer;
-let cakeGroup, topTier, midTier, botTier, cakeSlice, candlesGroup = [];
-
-function init3D() {
-  const container = document.getElementById('cake-stage-container');
-  
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.set(0, 10, 25);
-
-  renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.shadowMap.enabled = true;
-  container.appendChild(renderer.domElement);
-
-  // Lighting Setup
-  const ambientLight = new THREE.AmbientLight(0xfff6ea, 0.7);
-  scene.add(ambientLight);
-
-  const dirLight = new THREE.DirectionalLight(0xffc94d, 1.2);
-  dirLight.position.set(10, 20, 15);
-  dirLight.castShadow = true;
-  scene.add(dirLight);
-
-  const pointLight = new THREE.PointLight(0xff4d8d, 1, 30);
-  pointLight.position.set(-10, 5, -10);
-  scene.add(pointLight);
-
-  // Procedural Cake Construction
-  cakeGroup = new THREE.Group();
-  scene.add(cakeGroup);
-
-  const pinkMat = new THREE.MeshStandardMaterial({ color: 0xff4d8d, roughness: 0.3 });
-  const sageMat = new THREE.MeshStandardMaterial({ color: 0x9CAF88, roughness: 0.4 });
-  const creamMat = new THREE.MeshStandardMaterial({ color: 0xfff6ea, roughness: 0.2 });
-  const goldMat = new THREE.MeshStandardMaterial({ color: 0xffc94d, metalness: 0.3, roughness: 0.2 });
-
-  // 1. Bottom Tier
-  const botGeo = new THREE.CylinderGeometry(6, 6, 3, 32);
-  botTier = new THREE.Mesh(botGeo, sageMat);
-  botTier.position.y = -1.5;
-  cakeGroup.add(botTier);
-
-  // 2. Middle Tier
-  const midGeo = new THREE.CylinderGeometry(4.5, 4.5, 2.5, 32);
-  midTier = new THREE.Mesh(midGeo, creamMat);
-  midTier.position.y = 1.25;
-  cakeGroup.add(midTier);
-
-  // 3. Top Tier
-  const topGeo = new THREE.CylinderGeometry(3, 3, 2, 32);
-  topTier = new THREE.Mesh(topGeo, pinkMat);
-  topTier.position.y = 3.5;
-  cakeGroup.add(topTier);
-
-  // Candles on top tier
-  for(let i = 0; i < 5; i++) {
-    const angle = (i / 5) * Math.PI * 2;
-    const candleGroup = new THREE.Group();
-    
-    const stickGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.8, 16);
-    const stick = new THREE.Mesh(stickGeo, goldMat);
-    candleGroup.add(stick);
-
-    const flameGeo = new THREE.SphereGeometry(0.15, 16, 16);
-    const flameMat = new THREE.MeshBasicMaterial({ color: 0xff7a45 });
-    const flame = new THREE.Mesh(flameGeo, flameMat);
-    flame.position.y = 0.5;
-    candleGroup.add(flame);
-
-    candleGroup.position.set(Math.cos(angle) * 1.8, 4.9, Math.sin(angle) * 1.8);
-    cakeGroup.add(candleGroup);
-    candlesGroup.push(flame);
-  }
-
-  // 4. Detachable Cake Slice (Revealed inside at the final section)
-  cakeSlice = new THREE.Group();
-  
-  // Cutout Geometry Shape
-  const shape = new THREE.Shape();
-  shape.moveTo(0,0);
-  shape.arc(0, 0, 6, 0, Math.PI / 4, false);
-  shape.lineTo(0,0);
-
-  const extrudeSettings = { depth: 7.5, bevelEnabled: false };
-  const sliceGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-  
-  const sliceInnerMat = new THREE.MeshStandardMaterial({ color: 0xffe6c2, roughness: 0.6 });
-  const sliceMesh = new THREE.Mesh(sliceGeo, sliceInnerMat);
-  sliceMesh.rotation.x = Math.PI / 2;
-  sliceMesh.position.y = -3;
-  
-  cakeSlice.add(sliceMesh);
-  cakeGroup.add(cakeSlice);
-
-  setupScrollAnimations();
-}
-
-/* Scroll-Driven Animations mapping Section triggers to 3D Camera & Cake Object transforms */
-function setupScrollAnimations() {
-  // Global continuous ambient rotation
-  gsap.to(cakeGroup.rotation, {
-    y: Math.PI * 2,
-    duration: 30,
-    repeat: -1,
-    ease: "none"
-  });
-
-  // Section 1: Hero to Top Tier
-  gsap.timeline({
-    scrollTrigger: {
-      trigger: "#sec-wishes",
-      start: "top bottom",
-      end: "top center",
-      scrub: 1
-    }
-  })
-  .to(camera.position, { x: 0, y: 6, z: 12 })
-  .to(cakeGroup.rotation, { x: 0.2 }, 0);
-
-  // Section 2: Camera pans to Middle Tier
-  gsap.timeline({
-    scrollTrigger: {
-      trigger: "#sec-scratch",
-      start: "top bottom",
-      end: "top center",
-      scrub: 1
-    }
-  })
-  .to(camera.position, { x: -6, y: 2, z: 14 })
-  .to(cakeGroup.rotation, { x: -0.1 }, 0);
-
-  // Section 3: Camera moves to Bottom Tier
-  gsap.timeline({
-    scrollTrigger: {
-      trigger: "#sec-games",
-      start: "top bottom",
-      end: "top center",
-      scrub: 1
-    }
-  })
-  .to(camera.position, { x: 6, y: -2, z: 16 });
-
-  // Section 4: Final Section - Cake Slices Open & Camera zooms INSIDE
-  gsap.timeline({
-    scrollTrigger: {
-      trigger: "#sec-slice",
-      start: "top bottom",
-      end: "center center",
-      scrub: 1
-    }
-  })
-  .to(cakeSlice.position, { x: 4, z: 4, duration: 1 }) // Pull slice out
-  .to(camera.position, { x: 1, y: 0, z: 6, duration: 1.5 }, 0.2) // Zoom into slice gap
-  .to(cakeGroup.rotation, { x: 0.1, y: Math.PI * 0.25 }, 0);
-
-  // Trigger UI Card view animations
-  const cards = document.querySelectorAll('.content-card');
-  cards.forEach((card) => {
-    ScrollTrigger.create({
-      trigger: card,
-      start: "top 80%",
-      onEnter: () => card.classList.add('in-view'),
-      onLeaveBack: () => card.classList.remove('in-view')
+  // Simple Reveal Animation on Scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting) entry.target.classList.add('in-view');
     });
-  });
-}
+  }, { threshold: 0.15 });
 
-// Window Resize Handler
-window.addEventListener('resize', () => {
-  if (!camera || !renderer) return;
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-// Animation Loop
-function animate() {
-  requestAnimationFrame(animate);
-  // Flickering candles
-  candlesGroup.forEach(flame => {
-    flame.scale.setScalar(0.8 + Math.random() * 0.4);
-  });
-  renderer.render(scene, camera);
-}
+  // Interactive Scratch Cards Setup
+  document.querySelectorAll('.scratch-canvas').forEach(canvas => {
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    ctx.fillStyle = '#9CAF88';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
 
-window.addEventListener('DOMContentLoaded', () => {
-  init3D();
-  animate();
-});
-
-/* ==========================================================================
-   CONFETTI & INTERACTIVE FX
-   ========================================================================== */
-function triggerMassiveConfetti() {
-  const canvas = document.getElementById('confetti-canvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  const particles = Array.from({ length: 150 }).map(() => ({
-    x: Math.random() * canvas.width,
-    y: -20,
-    color: ['#ff4d8d', '#ffc94d', '#35dfc0', '#ff7a45'][Math.floor(Math.random() * 4)],
-    size: Math.random() * 10 + 5,
-    vx: (Math.random() - 0.5) * 4,
-    vy: Math.random() * 4 + 2
-  }));
-
-  function renderConfetti() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach(p => {
-      p.x += p.vx;
-      p.y += p.vy;
-      ctx.fillStyle = p.color;
-      ctx.fillRect(p.x, p.y, p.size, p.size);
-    });
-    if (particles.some(p => p.y < canvas.height)) {
-      requestAnimationFrame(renderConfetti);
+    let isDrawing = false;
+    function scratch(e){
+      if(!isDrawing) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX || e.touches[0].clientX) - rect.left;
+      const y = (e.clientY || e.touches[0].clientY) - rect.top;
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath();
+      ctx.arc(x,y,20,0,Math.PI*2);
+      ctx.fill();
     }
-  }
-  renderConfetti();
-}
+    canvas.addEventListener('mousedown', () => isDrawing = true);
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mousemove', scratch);
+    canvas.addEventListener('touchmove', scratch);
+  });
 
-document.getElementById('confettiBtn').addEventListener('click', triggerMassiveConfetti);
+  // Slot Machine Quick Script
+  const slotEmojis = ['🍀','🌤️','🎁','🎉','🎂','⭐'];
+  document.getElementById('slotSpinBtn').addEventListener('click', () => {
+    const a = slotEmojis[Math.floor(Math.random()*slotEmojis.length)];
+    const b = slotEmojis[Math.floor(Math.random()*slotEmojis.length)];
+    const c = slotEmojis[Math.floor(Math.random()*slotEmojis.length)];
+    document.getElementById('slotReelA').textContent = a;
+    document.getElementById('slotReelB').textContent = b;
+    document.getElementById('slotReelC').textContent = c;
+    document.getElementById('slotResult').textContent = (a===b && b===c) ? "JACKPOT! Extraordinary year ahead! 🎉" : "Spun! Wishing you top luck! 🍀";
+  });
 
-// Inline Slot Machine Mini-Game
-document.getElementById('spinBtn').addEventListener('click', () => {
-  const reels = ['🍀', '🌤️', '🎁', '🎂', '💖', '👑'];
-  const r1 = document.getElementById('reel1');
-  const r2 = document.getElementById('reel2');
-  const r3 = document.getElementById('reel3');
-
-  let count = 0;
-  const interval = setInterval(() => {
-    r1.textContent = reels[Math.floor(Math.random() * reels.length)];
-    r2.textContent = reels[Math.floor(Math.random() * reels.length)];
-    r3.textContent = reels[Math.floor(Math.random() * reels.length)];
-    count++;
-    if(count > 15) {
-      clearInterval(interval);
-      r1.textContent = '🎂'; r2.textContent = '🎂'; r3.textContent = '🎂';
-      triggerMassiveConfetti();
-    }
-  }, 100);
-});
+  // Final Slice Check-in Interaction
+  document.getElementById('yesBtn').addEventListener('click', () => {
+    document.getElementById('finalMessage').style.display = 'block';
+  });
+  document.getElementById('noBtn').addEventListener('mouseover', (e) => {
+    e.target.style.transform = `translate(${Math.random()*100 - 50}px, ${Math.random()*100 - 50}px)`;
+  });
 </script>
 </body>
 </html>
