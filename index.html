@@ -16,7 +16,7 @@
   4. Edit the messages hidden inside the gift boxes in "SURPRISES".
   5. Edit the four facts in "THE HIGHLIGHT REEL".
   6. Edit the fortunes in the "FORTUNE WHEEL" section if you like.
-  7. Swap the 6 entries in the FRIENDS array (in the script, near
+  7. Swap the 7 entries in the FRIENDS array (in the script, near
      "FRIENDS' ALBUM DATA") for real photos and real messages from
      real friends.
   8. Edit the closing message in "FINAL CHECK-IN" (the "Are you
@@ -1071,7 +1071,17 @@
     font-size:17px;
     line-height:1.7;
     color:var(--cream);
+    max-height:220px;
+    overflow-y:auto;
+    padding-right:12px;
+    scrollbar-width:thin;
+    scrollbar-color:var(--sage) transparent;
+    white-space:pre-line;
   }
+  .album-message-text::-webkit-scrollbar{ width:6px; }
+  .album-message-text::-webkit-scrollbar-track{ background:transparent; }
+  .album-message-text::-webkit-scrollbar-thumb{ background:var(--sage); border-radius:10px; }
+  .album-message-text::-webkit-scrollbar-thumb:hover{ background:var(--sage-light); }
   .album-signoff{
     display:flex; align-items:center; gap:10px;
     margin-top:20px;
@@ -1833,17 +1843,17 @@
     <div class="wish-grid reveal">
       <article class="wish-card">
         <span class="label">For the year ahead</span>
-        <p>Another year has found you, and honestly, the world is a little better for it. I hope today feels exactly like you — good light, easy laughter, and people around you who make it obvious how loved you are. Whatever this next chapter brings, I hope it brings more of what makes you, you.</p>
+        <p>I don't say this enough, so I'm putting it in writing: I'm genuinely glad you exist. Not in a card caption way, in a "my life is better because you're in it" way. There's a verse I think of when I think of you: <em>"She is clothed with strength and dignity; she can laugh at the days to come."</em> (Proverbs 31:25). That's what I hope for you this year, strength, and a lot of laughing.</p>
         <span class="sign">— with love, always</span>
       </article>
-      <article class="wish-card">
-        <span class="label">Not-so-serious version</span>
-        <p>Officially older, allegedly wiser. I won't tell anyone your real age if you don't bring up that one party we agreed to never speak of again. Deal? Here's to cake for breakfast, zero regrets, and a birthday exactly as ridiculous and wonderful as you deserve.</p>
-        <span class="sign">— your partner in bad decisions</span>
+            <article class="wish-card">
+        <span class="label">Right now, today</span>
+        <p>I hope today actually feels like a birthday and not just another Wednesday you have to get through. I hope someone gets your coffee order right on the first try, the weather cooperates, and you get a solid hour where you're not thinking about anything you're supposed to be doing. You've earned a day that's just for you. Let people make a fuss over you, even if you'd rather they didn't.</p>
+        <span class="sign">— someone who notices</span>
       </article>
       <article class="wish-card">
         <span class="label">Looking forward</span>
-        <p>May this year bring you soft landings and wide-open doors — the kind of year where good things keep finding you first. Chase the plans that scare you a little. Rest when you actually need it. And know that wherever you go, there's a whole cheering section rooting for you.</p>
+        <p>You've had a lot on your plate lately, and you've handled it better than you probably give yourself credit for. <em>"For I know the plans I have for you," declares the Lord, "plans to prosper you and not to harm you."</em> (Jeremiah 29:11). Whatever this year holds, I hope it's kind to you, and I'll still be right here regardless.</p>
         <span class="sign">— cheering loudest from here</span>
       </article>
     </div>
@@ -1954,30 +1964,30 @@
     </div>
 
     <div class="garland reveal">
-      <figure class="polaroid" data-caption="The trip we still bring up unprompted.">
+      <figure class="polaroid" data-caption="Family">
         <span class="pin"></span>
-        <img src="https://picsum.photos/seed/birthday-trip/400/400" alt="A memory from a trip together" loading="lazy">
-        <figcaption class="caption">the trip</figcaption>
+        <img src="pictures/1.jpg" alt="A memory from a trip together" loading="lazy">
+        <figcaption class="caption">Family</figcaption>
       </figure>
-      <figure class="polaroid" data-caption="This exact laugh, captured mid-sentence, never gets old.">
+      <figure class="polaroid" data-caption="Us">
         <span class="pin"></span>
-        <img src="https://picsum.photos/seed/birthday-laugh/400/400" alt="A candid laughing moment" loading="lazy">
-        <figcaption class="caption">that laugh</figcaption>
+        <img src="pictures/2.jpg" alt="A candid laughing moment" loading="lazy">
+        <figcaption class="caption">Us</figcaption>
       </figure>
-      <figure class="polaroid" data-caption="Cake number one of what became an alarming number of cakes.">
+      <figure class="polaroid" data-caption="Birthday Vee!!!">
         <span class="pin"></span>
-        <img src="https://picsum.photos/seed/birthday-cake/400/400" alt="A birthday cake moment" loading="lazy">
-        <figcaption class="caption">cake #1</figcaption>
+        <img src="pictures/3.jpg" alt="A birthday cake moment" loading="lazy">
+        <figcaption class="caption">Birthday Vee!!!</figcaption>
       </figure>
-      <figure class="polaroid" data-caption="Hands down, no notes, one of the best days on record.">
+      <figure class="polaroid" data-caption="Arf arf arf (Happy Birthday atiii!)">
         <span class="pin"></span>
-        <img src="https://picsum.photos/seed/birthday-bestday/400/400" alt="A great day out together" loading="lazy">
-        <figcaption class="caption">best day</figcaption>
+        <img src="pictures/4.jpg" alt="A great day out together" loading="lazy">
+        <figcaption class="caption">Maggieeee</figcaption>
       </figure>
-      <figure class="polaroid" data-caption="Just being exactly who you are, which is always the best version.">
+      <figure class="polaroid" data-caption="Friends">
         <span class="pin"></span>
-        <img src="https://picsum.photos/seed/birthday-us/400/400" alt="A relaxed everyday moment" loading="lazy">
-        <figcaption class="caption">just us</figcaption>
+        <img src="pictures/5.jpg" alt="A relaxed everyday moment" loading="lazy">
+        <figcaption class="caption">Friends</figcaption>
       </figure>
     </div>
   </section>
@@ -1986,7 +1996,7 @@
   <section id="friends-album">
     <div class="reveal">
       <span class="eyebrow sage">💌 from your people</span>
-      <h2 class="section-title">Your friends left you something too</h2>
+      <h2 class="section-title">The ones you love left you something too</h2>
       <p class="section-sub">Six photos, six messages. Click the photo to see it bigger, or use the arrows to flip through.</p>
     </div>
 
@@ -2069,7 +2079,7 @@
           <div class="gift-lid"></div>
         </div>
         <span class="gift-hint">tap to open</span>
-        <p class="gift-msg" data-msg="A small houseplant of appreciation, delivered digitally. Water it with naps and good snacks. 🌿"></p>
+        <p class="gift-msg" data-msg="One (1) permission slip to do absolutely nothing today. Redeemable for guilt-free naps and snacks in bed. 🌿"></p>
       </button>
     </div>
   </section>
@@ -2190,31 +2200,31 @@
         <div class="envelope-label">...you need a reminder</div>
         <div class="envelope-letter"></div>
       </button>
-      <button class="envelope" type="button" data-msg="Miss you. That's it, that's the note. Talk soon.">
+      <button class="envelope" type="button" data-msg="I miss you and every moment we're not together. Iloveyou boo">
         <div class="envelope-body"></div>
         <div class="envelope-flap"></div>
         <div class="envelope-label">...you miss me</div>
         <div class="envelope-letter"></div>
       </button>
-      <button class="envelope" type="button" data-msg="You're funnier than you give yourself credit for, and yes, that joke from earlier was actually good.">
+      <button class="envelope" type="button" data-msg="Payag ka? Umuulan ng pera pero puro centimo">
         <div class="envelope-body"></div>
         <div class="envelope-flap"></div>
         <div class="envelope-label">...you need a laugh</div>
         <div class="envelope-letter"></div>
       </button>
-      <button class="envelope" type="button" data-msg="Rough day? It'll ease up. You've gotten through every hard day so far — this one's no different." >
+      <button class="envelope" type="button" data-msg="You'll get through it boo. I know you can and know that I'm always here." >
         <div class="envelope-body"></div>
         <div class="envelope-flap"></div>
         <div class="envelope-label">...it's a bad day</div>
         <div class="envelope-letter"></div>
       </button>
-      <button class="envelope" type="button" data-msg="You should be proud of yourself right now. Seriously. Take the win.">
+      <button class="envelope" type="button" data-msg="I am always proud of you. All the small and big achievements and I am always here to celebrate it with you.">
         <div class="envelope-body"></div>
         <div class="envelope-flap"></div>
         <div class="envelope-label">...you're proud of yourself</div>
         <div class="envelope-letter"></div>
       </button>
-      <button class="envelope" type="button" data-msg="You are, in fact, a genuinely great person to be around. This has been independently verified (by me, repeatedly).">
+      <button class="envelope" type="button" data-msg="You are, in fact, the most beautiful, kind-hearted, strong woman I've ever been with and no one and nothing can ever change that.">
         <div class="envelope-body"></div>
         <div class="envelope-flap"></div>
         <div class="envelope-label">...you want a compliment</div>
@@ -2229,14 +2239,14 @@
     <h2 class="section-title" style="margin:0 auto;">However you spend today, I hope it's a good one</h2>
     <p class="section-sub">One more for the road.</p>
     <button class="finale-btn" id="finaleBtn">Send one more surprise 🎉</button>
-    <p class="signature">Made with love <span class="leaf">(and way too much CSS and sage green) 🌿</span>, just for you. 🎂</p>
+    <p class="signature">Made with love <span class="leaf"> 🌿</span>, just for you. 🎂</p>
   </section>
 
   <!-- ============================= FINAL CHECK-IN ============================= -->
   <section class="final-check reveal" id="finalCheck">
     <span class="eyebrow">💛 one truly last thing</span>
     <h2 class="section-title" style="margin:0 auto;">Are you happy today?</h2>
-    <p class="section-sub">Be honest — actually, do not. Just click yes.</p>
+    <p class="section-sub">Be honest</p>
 
     <div class="check-buttons" id="checkButtons">
       <button class="check-btn yes-btn" id="yesBtn" type="button">Yes</button>
@@ -2248,7 +2258,7 @@
     <div class="final-message" id="finalMessage" aria-live="polite">
       <div class="final-message-inner">
         <span class="final-emoji">🎂</span>
-        <p>Good. That's exactly how today should feel. Whatever's made it that way — hold onto it, and let the rest of today just be yours, start to finish. I'm so glad you're having a good one. Happy birthday, Vea. I mean every single word on this page, and I hope this year is the best one yet.</p>
+        <p>Good and that's how you should feel today. Let this be a start to a year to become more wiser, stronger, and kinder. All the ups and downs, know that you have someone with you always. Happy birthday, Vea. I mean every single word on this page, and I hope this year is the best one yet. I love youuu!!</p>
         <span class="final-sign">— with all my love, today and every day after 💛</span>
       </div>
     </div>
@@ -3108,46 +3118,60 @@
   --------------------------------------------------------------- */
   var FRIENDS = [
     {
-      name: 'Priya',
-      rel: 'roommate, 2019–2021',
+      name: 'Ate Vane',
+      rel: '',
       seed: 'friend-priya',
-      alt: 'Photo shared by Priya',
-      message: "Remember when we said we'd only stay for 'one drink'? Neither of us has ever once, in the history of us, left after one drink. Happiest birthday to my favorite bad influence."
+      photo: 'pictures/Vane.jpg',
+      alt: 'Photo shared by Ate Vane',
+      message: "Ve, \nHappy mid-life birthday! I hope you know how much we care and love you so much. Tough love ganyan. Kasi gusto namin maging tougher ka sa buhay kaysa samin dahil maraming opportunities, challenges and successes na dadating pa sayo. Laging paalala namin sayo, mga pangaral nina mom and dad lagi mong tatandaan kasi those are the things that we have experienced and learned na we also want you to learn especially the mistakes. We learn from it and apply it sa buhay.\n\nKnow that we are very proud of all your accomplishments - getting your degree kahit mahirap kasi may pandemic na kasama sa mix ng mahihirap na subjects at professors, getting a job sa tutor, sa corporate at even sa HP, sa lahat - kasi alam naming pinaghirapan mo yun lahat kahit di lahat ng happenings ay nakapabor sayo - yung mga downs especially na tinetest ka talaga - which is part of the whole life experience. We are lucky and so blessed to have gone through these things especially ikaw kasi na susurvive mo kahit mahirap at nakakapagod. Simula pa lang yan, lagi naman namin sinasabi yan sayo. Kaya pakatatag ka palagi.\n\nWe thank you for looking after the parents kapag nasa work kami. We know how hard to put up with them on a daily basis. Thank you for looking after kuya, lola and the lil fufs na makukulit and supporting mom managing the ganaps sa bahay. Na appreciate yan nila kahit di nila sinasabi palagi.\n\nAlways remember to pray kay Lord - magpasalamat sa lahat ng blessings, humingi ng lakas sa kanya kapag nahihirapan ka sa mga ganap sa buhay. There's a lot coming for you - better days for sure! Ibang mag surprise si Lord sa buhay. Enjoy the next chapter of your life - make it count and have fun! Maligayang kaarawan ve!\n\nLove,\nAte Vane"
     },
     {
-      name: 'Sam',
-      rel: 'college roommate',
+      name: 'Juji Ganda',
+      rel: '',
       seed: 'friend-sam',
+      photo: 'pictures/Juji.jpg',
       alt: 'Photo shared by Sam',
-      message: "You were the only person who'd study with me at 2am and somehow make it fun. A decade later and you're still the friend I call first with good news. Love you, happy birthday."
+      message: "Vidadi, \nHappiest 25th birthdaaay and I guess, welcome to adulting life? Hahaha kidding aside, I'm happy that I get to celebrate you, becoming the young woman you want to be. \nBut I can't help to always look at you as my baby sister --- yung batang inaalagaan ko nung kindergarten, yung batang kalaro ko during my elem and 1st year HS days, yung batang kasama ko lagi sa kalokohan sa bahay, yung batang I can keep secrets with, at yung batang tinuring akong 2nd mother nya. \n\nThank you for taking care of the fam especially wala naman kami palagi kasama mo. Thank you for being a sister to my Mochi and for taking over for me dahil wala din ako madalas sa bahay. Thank you for being a friend too, I can't imagine my teenage years be that colorful if you weren't in it. \n\nNgayong 25 ka na, I know you can make wiser decisions for yourself, but always remember to be kinder to yourself. Hindi minamadali ang success or ang path na binigay at ibibigay ni Lord sayo. Always pray and trust the Lord -- andito ako and the whole fam to support and love you, no need to pressure yourself too much. Always know that I'm very proud to call you my sister, and I'm grateful to the Lord that He let us cross paths in this lifetime. To more kulitans, travels, and memories with you, Vidadi! Happy birthday and love you much! \n\nLove, Juji Ganda"
     },
     {
-      name: 'Jordan',
-      rel: 'work bestie',
+      name: 'Daddy po',
+      rel: '',
       seed: 'friend-jordan',
+      photo: 'pictures/Daddy.jpg',
       alt: 'Photo shared by Jordan',
-      message: "You made a genuinely stressful job feel survivable, mostly through excellent snack sharing and even better commentary. Here's to another year of us surviving Mondays together."
+      message: "Happy birthday to my beautiful daughter kung tunay hahaha and may your special day be with love & joy without simangot or something sama ng loob with your visor and patients with pabango 😅 take care always and reduce gala...love u❤️❤️❤️",
     },
     {
-      name: 'Mia',
-      rel: 'since we were 8',
+      name: 'Mommy',
+      rel: '',
       seed: 'friend-mia',
+      photo: 'pictures/Mommy.jpg',
       alt: 'Photo shared by Mia',
-      message: "We've known each other longer than we haven't, which is a wild thing to realize. Thanks for being exactly the same amazing person you were at eight, just with better taste in shoes."
+      message: "Happy birthday pangit😛May all your wishes come true..Have more patience in all your endeavor..Have faith in yourself...Luv yah🥰",
     },
     {
-      name: 'Chris',
-      rel: 'hiking buddy',
+      name: 'Ate Jessa & Monic',
+      rel: '',
       seed: 'friend-chris',
+      photo: 'pictures/Monica.jpg',
       alt: 'Photo shared by Chris',
-      message: "This is still the best view I've ever had, and you insisted we take the 'hard' trail just to prove a point. Worth it. Can't wait for wherever we get lost next."
+      message: "Happy birthday to our Veeeeee! 🎂💗✨\n\nMeeting you has truly been one of the treasured moments we will always be grateful for. You came into our lives and became such a beautiful blessing, bringing so much laughter, happiness, and unforgettable memories with you. Your contagious laugh and never-ending funny humor will always have a special place in our hearts. Ate Jessa and I will always be here, cheering you on and rooting for your success. On your special day, we wish you nothing but the best in life—success in your career, good health, genuine happiness, and all the beautiful things your heart deserves. May the desires of your heart be granted in His perfect time, and may the Lord continue to guide and bless you in every step of your journey. Always remember that Ate Jessa and I are just one call away. No matter where life takes you, you will always have us—not just as friends, but as your big sisters for life. We love you so, so much, our Veeeeee and our little ray of sunshine! Happy birthday! May this new chapter of your life be filled with love, laughter, answered prayers, and countless reasons to smile. You deserve all the good things coming your way. Love,Ate Jessa & Monic",
     },
     {
-      name: 'Taylor',
-      rel: 'the group chat',
+      name: 'Iste, Jhym, Ryzza, Nicole',
+      rel: '',
       seed: 'friend-taylor',
+      photo: 'pictures/Nicole.jpg',
       alt: 'Photo shared by Taylor',
-      message: "You're the reason our group chat has 400 unread messages at any given time and honestly it's the highlight of my day. Happy birthday to the glue that holds us all together."
+      message: "HAPPY HAPPY BIRTHDAY MAH DZAIII!!! This is me your always MIA frennyy HAHAHAHAH, I always wish for your constant happiness in life. Don't forget that I always gotchuu whenever you need me the most. ILOVEYOUUU MWAAA!!!! ❤ - ISTE \n\nKonichiwa, watashiwa Jhym imnida. hola Vea soy Dora. Maligayang Birthday sa imong tanan, I wish you a saeng-il chughahaeyo eh eh Waka waka eh eh. And wish you all the best in life because we are alive. Adios - JHYM \n\nhappy birthday ate vea, i hope u enjoy ur day today and wish u all the best. Praying na lahat ng prayers and wishes mo ay maging answered prayers in God’s perfect time and according to His will and plan for you, u deserve all the good things in life, happiest bday ulit ate vea mariebatumbakal pa coffee ka naman eme- RYZZA \n\nHappy birthday pshan!! Every year kong winiwish na na makuha mo ang peace at happiness na gusto moo. Im always rooting for you! Love youu alwayss. Happy birthdayy mwaa<3 - NICOLE",
+    },
+    {
+      name: 'Chester, Patrick, Nicole',
+      rel: '',
+      seed: 'friend-alex',
+      photo: 'pictures/Platon.jpg',
+      alt: 'Photo shared by Alex',
+      message: "Happy birthday, VEAAA! \n\nSHS years will always be memorable, all because of this tropahan.  Grateful kami na hanggang ngayon, we’re still here, creating new memories together despite how much time has passed. (At once a year nalang tayo nagkikita kita) \n\nWe wish you all the happiness, peace, and success in life. Sana makuha mo lahat-lahat ng gusto mo sa buhay. (Kasi uutangan ka namin. HAHAHAHA) Cheers to more years of friendship, more gala, more chismisan, and more memories together. Sana matuloy na talaga ang gala natin this time! HAHAHA Happy birthday, Vea Millette! 🥳❤️ We love you!",
     }
   ];
 
